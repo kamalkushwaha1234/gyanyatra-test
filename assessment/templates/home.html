@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}
+    Assessment List
+{% endblock title %}
+{% block content %}
+    <script>
+        function copyToClipboard(text, event) {
+            const input = document.createElement('textarea');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            event.target.innerText = 'Copied!!';
+            event.target.classList.remove('btn-outline-dark');
+            event.target.classList.add('btn-outline-success');
+            setTimeout(() => {
+                event.target.innerText = 'Copy Link';
+                event.target.classList.remove('btn-outline-success');
+                event.target.classList.add('btn-outline-dark');
+            }, 3000);
+        }
+    </script>
+    <article class="container my-5">
+        {% if messages %}
+            {% for message in messages %}
+                <div {% if message.tags %} class="alert my-2 {% if message.tags == "error" %} alert-danger {% else %} alert-{{ message.tags }} {% endif %}
+                     alert-dismissible
+                     fade
+                     show
+                     "
+                     {% endif %}
+                     role="alert">
+                    {{ message }}
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <section class="d-flex gap-4 flex-wrap">
+            {% if error %}<h3>{{ error }}</h3>{% endif %}
+            {% if not assessments and not error %}<h3>You have not created any Assessments.</h3>{% endif %}
+            {% for assessment in assessments %}
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url "assessment_results" assessment.id %}"
+                           class="text-decoration-none">
+                            <h5 class="card-title">{{ assessment.name|safe }}</h5>
+                        </a>
+                        <p class="card-text">No. of questions: {{ assessment.totalquestions }}</p>
+                        <p class="card-text">Maximum Marks: {{ assessment.assessment_maximum_marks }}</p>
+                        <p class="card-text">User: {{ assessment.getuser }}</p>
+                        <p class="card-text">Level: {{ assessment.level }}</p>
+                        {% for sub in subject %}
+                            {% if sub.value == assessment.subject %}
+                               <p class="card-text">Course: {{sub.label}}</p>
+                            {% endif %}
+                        {% endfor %}
+                        <div class="d-flex justify-content-between gap-4">
+                            <a class="btn btn-outline-dark"
+                               href="#"
+                               onclick="copyToClipboard('{{ assessment.assessment_generate_url }}', event)"
+                               role="button"
+                               aria-label="Copy Link">Copy Link</a>
+                            <a class="btn {% if assessment.active %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
+                               href="{% url "activate_deactivate_assessment" assessment.id %}"
+                               {% if assessment.active %}onclick="return confirm('Are you sure you want to deactivate this assessment?')"{% endif %}
+                               role="button"
+                               aria-label="Delete Assessment">
+                                {% if assessment.active %}
+                                    Deactivate
+                                {% else %}
+                                    Activate
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+    </article>
+{% endblock content %}

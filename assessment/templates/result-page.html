@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ assessment_result.name }}'s Result
+{% endblock title %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div id="alert-{{ forloop.counter }}"
+                             tabindex="0"
+                             aria-live="polite"
+                             class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                             role="alert"
+                             aria-label="{{ message }}">
+                            {{ message }}
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Assessment Result</h2>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Name:</dt>
+                            <dd class="col-sm-8">
+                                {{ assessment_result.name }}
+                            </dd>
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">
+                                {{ assessment_result.email }}
+                            </dd>
+                            <dt class="col-sm-4">Course:</dt>
+                            {% for sub in subject%}
+                                {% if sub.value == assessment_result.assessment.subject  %}
+                                    <dd class="col-sm-8">
+                                        {{ sub.label }}
+                                    </dd>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <dt class="col-sm-4">Organization:</dt>
+                            <dd class="col-sm-8">
+                                {{ assessment_result.organization }}
+                            </dd>
+                            <dt class="col-sm-4">Grade:</dt>
+                            <dd class="col-sm-8">
+                                {{ assessment_result.grade }}
+                            </dd>
+                            <dt class="col-sm-4">Max Marks:</dt>
+                            <dd class="col-sm-8">
+                                {{ assessment_result.assessment.maximum_marks }}
+                            </dd>
+                            <dt class="col-sm-4">Marks Obtained:</dt>
+                             <dd class="col-sm-8">
+                                {{ assessment_result.new_score.total_score }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-5">
+            {% if  assessment_result.assessment.show_correct_answer %}
+
+            <button onclick="location.href='/correct_answer/{{ assessment_result.id }}'" class="btn mt-4" style="background-color: #a8a8a8; color: black;" aria-label="View Detailed Report ">
+                View Correct Answers 
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#alert-1').onload = () => {
+                document.querySelector('#alert-1').focus();
+            }
+        });
+
+    </script>
+{% endblock content %}

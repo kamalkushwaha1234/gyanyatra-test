@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Tools - M4A to MP3 Converter{% endblock title %}
+{% block content %}
+<article class="container my-5">
+    <h2 class="mb-1">M4A to MP3 Converter</h2>
+    <p class="text-muted mb-4">Convert audio files from M4A format to MP3 entirely in your browser — no upload required.</p>
+
+    {# Screen-reader-only live region for completion/error announcements #}
+    <div id="announce" role="status" aria-live="polite" aria-atomic="true" class="visually-hidden"></div>
+
+    <div class="card" style="max-width: 560px;">
+        <div class="card-body">
+            <div id="ffmpeg-status" class="alert alert-info" role="status" aria-live="polite">
+                Please wait we are getting things ready for you&hellip;
+            </div>
+
+            <div id="converter-ui" style="display:none;">
+                <div class="mb-3">
+                    <label for="file-input" class="form-label fw-semibold">Select .m4a file</label>
+                    <input class="form-control" type="file" id="file-input"
+                           accept=".m4a,audio/mp4,audio/x-m4a"
+                           aria-describedby="file-hint">
+                    <div id="file-hint" class="form-text">Accepted format: .m4a</div>
+                </div>
+
+                <div id="progress-wrapper" class="mb-3" style="display:none;" aria-hidden="true">
+                    <label id="progress-label" class="form-label">Converting&hellip;</label>
+                    {# text updated via JS on completion/error #}
+                    <div class="progress" role="none">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             aria-labelledby="progress-label"
+                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                             style="width: 0%;">
+                            0%
+                        </div>
+                    </div>
+                    <small id="progress-log" class="text-muted mt-1 d-block" aria-hidden="true"></small>
+                </div>
+
+                <button id="convert-btn" class="btn btn-primary" disabled
+                        aria-describedby="file-hint">
+                    Convert to MP3
+                </button>
+
+                <div id="download-wrapper" class="mt-3" style="display:none;">
+                    <a id="download-link" class="btn btn-success" download="output.mp3"
+                       aria-label="Download converted MP3 file">
+                        Download MP3
+                    </a>
+                </div>
+
+                <div id="success-wrapper" class="mt-3 alert alert-success" style="display:none;"
+                     role="status" aria-live="polite"></div>
+
+                <div id="error-wrapper" class="mt-3 alert alert-danger" style="display:none;"
+                     role="alert" aria-live="assertive"></div>
+            </div>
+        </div>
+    </div>
+</article>
+
+{# ffmpeg.js 0.11.x bundles its worker inline as a blob URL, avoiding cross-origin Worker errors #}
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js"></script>
+<script>
+    const { createFFmpeg, fetchFile } = FFmpeg;
+
+    const statusEl     = document.getElementById("ffmpeg-status");
+    const converterUI  = document.getElementById("converter-ui");
+    const fileInput    = document.getElementById("file-input");
+    const convertBtn   = document.getElementById("convert-btn");
+    const progressWrap = document.getElementById("progress-wrapper");
+    const progressBar  = document.getElementById("progress-bar");
+    const progressLog  = document.getElementById("progress-log");
+    const downloadWrap  = document.getElementById("download-wrapper");
+    const downloadLink  = document.getElementById("download-link");
+    const successWrap   = document.getElementById("success-wrapper");
+    const errorWrap     = document.getElementById("error-wrapper");
+    const announceEl   = document.getElementById("announce");
+    const progressLabel = document.getElementById("progress-label");
+
+    let currentObjectUrl = null;
+
+    function announce(msg) {
+        // Clear first so the same message re-triggers screen readers
+        announceEl.textContent = "";
+        requestAnimationFrame(() => { announceEl.textContent = msg; });
+    }
+
+    const ffmpeg = createFFmpeg({
+        corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
+        log: true,
+        progress: ({ ratio }) => {
+            const pct = Math.min(100, Math.max(0, Math.round(ratio * 100)));
+            progressBar.style.width = pct + "%";
+            progressBar.textContent = pct + "%";
+            progressBar.setAttribute("aria-valuenow", pct);
+        },
+    });
+
+    ffmpeg.setLogger(({ message }) => {
+        progressLog.textContent = message;
+    });
+
+    async function loadFFmpeg() {
+        try {
+            await ffmpeg.load();
+            statusEl.classList.replace("alert-info", "alert-success");
+            statusEl.textContent = "We are ready you can start the conversion now.";
+            converterUI.style.display = "";
+        } catch (err) {
+            statusEl.classList.replace("alert-info", "alert-danger");
+            statusEl.textContent = "Failed to load FFmpeg engine: " + err.message;
+        }
+    }
+
+    fileInput.addEventListener("change", () => {
+        convertBtn.disabled = !fileInput.files.length;
+        downloadWrap.style.display = "none";
+        successWrap.style.display = "none";
+        errorWrap.style.display = "none";
+        announceEl.textContent = "";
+    });
+
+    convertBtn.addEventListener("click", async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        convertBtn.disabled = true;
+        convertBtn.setAttribute("aria-busy", "true");
+        progressWrap.style.display = "";
+        progressWrap.removeAttribute("aria-hidden");
+        downloadWrap.style.display = "none";
+        successWrap.style.display = "none";
+        errorWrap.style.display = "none";
+        progressBar.style.width = "0%";
+        progressBar.textContent = "0%";
+        progressBar.setAttribute("aria-valuenow", 0);
+        progressLabel.textContent = "Converting…";
+        announce("Conversion started. Please wait.");
+
+        try {
+            ffmpeg.FS("writeFile", "input.m4a", await fetchFile(file));
+            await ffmpeg.run("-i", "input.m4a", "-vn", "-acodec", "libmp3lame", "-q:a", "2", "output.mp3");
+
+            const data = ffmpeg.FS("readFile", "output.mp3");
+            const blob = new Blob([data.buffer], { type: "audio/mpeg" });
+            if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+            const url  = URL.createObjectURL(blob);
+            currentObjectUrl = url;
+
+            const baseName = file.name.replace(/\.[^/.]+$/i, "");
+            downloadLink.href = url;
+            downloadLink.download = baseName + ".mp3";
+            downloadLink.setAttribute("aria-label", "Download " + baseName + ".mp3");
+            downloadWrap.style.display = "";
+
+            progressLabel.textContent = "Done";
+            successWrap.textContent = "File converted successfully! Click the button below to download your MP3.";
+            successWrap.style.display = "";
+            announce("Conversion complete. Your MP3 file is ready to download.");
+
+            // Move focus to the download button so keyboard users can act immediately
+            downloadLink.focus();
+
+        } catch (err) {
+            progressBar.style.width = "0%";
+            progressBar.textContent = "0%";
+            progressBar.setAttribute("aria-valuenow", 0);
+            progressLabel.textContent = "Converting…";
+            errorWrap.textContent = "Conversion failed: " + err.message;
+            errorWrap.style.display = "";
+            announce("Conversion failed: " + err.message);
+        } finally {
+            // clean up virtual FS
+            try { ffmpeg.FS("unlink", "input.m4a"); } catch {}
+            try { ffmpeg.FS("unlink", "output.mp3"); } catch {}
+
+            convertBtn.disabled = false;
+            convertBtn.removeAttribute("aria-busy");
+            progressWrap.style.display = "none";
+            progressWrap.setAttribute("aria-hidden", "true");
+        }
+    });
+
+    loadFFmpeg();
+</script>
+{% endblock content %}

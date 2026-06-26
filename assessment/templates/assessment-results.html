@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Results
+{% endblock title %}
+
+{% block content %}
+<div id="results-alert" class="" role="alert"></div>
+
+<div id="results-container">
+    <div id="download_csv" class="d-flex mt-3 mx-4 gap-3">
+    </div>
+    <div class="table-responsive my-2 mx-4">
+        <table class="table table-bordered">
+            <thead id="results-table-header" class="table-dark" ></thead>
+            <tbody id="results-table-body"></tbody>
+        </table>
+
+        <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                <div id="pagination" class="pagination">
+
+                </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const rawLabels = {{ subject_labels|safe }};
+ 
+    const SUBJECT_LABELS = (rawLabels || []).reduce((acc, item) => {
+        if (item.value !== undefined) {
+            acc[item.value] = item.label;
+        }
+        return acc;
+    }, {});
+
+    function getDuration(start, end) {
+        if (!start || !end) {
+            return "";
+        }
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const durationMs = endDate - startDate;
+        const mins = Math.floor((durationMs / 1000 / 60) % 60);
+        const hrs = Math.floor((durationMs / 1000 / 60 / 60));
+        return `${hrs}h ${mins}m`;
+    }
+
+    function formatDateTime(value) {
+        if (!value) {
+            return "";
+        }
+
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? value : date.toLocaleString('en-US', {   year: 'numeric',   month: '2-digit',   day: '2-digit',   hour: '2-digit',   minute: '2-digit' });
+    }
+
+    function getSubjectLabel(subjectCode) {
+        return SUBJECT_LABELS[subjectCode] || subjectCode;
+    }
+
+    const assessmentId = {{ id|safe }}; 
+    const csrfToken = "{{ csrf_token }}";
+
+    function fetchResults(url) {
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const results = data?.results?.results?? [];
+            const BaseURL = window.location.origin + "/result-page/";
+            const DetailsURL = window.location.origin + "/correct_answer/";
+            const assessment_type = data?.results?.assessment_type?? "";
+            const assessment_max_marks = data?.results?.assessment_max_marks?? 0;
+            const total_question_type = data?.results?.total_question_type?? [];
+
+            if (!results.length) {
+                const alertBox = document.getElementById("results-alert");
+                alertBox.className = "";  // removes all classes
+                alertBox.classList.add("alert", "alert-warning", "my-2", "mx-4");
+                alertBox.innerHTML = "<p>Nobody has taken this assessment yet.</p>";
+                return;
+            }
+
+            let header = [];
+
+            if (assessment_type === "LS1EIQ1") {
+                header = ["Name", "Email", "Education", "Assessment", "Institute", "Subject", "Self awareness", "Managing emotions", "Motivating oneself", "Empathy", "Social Skill", "Level", "Sub Level", "Start Time", "End Time", "Duration", "View"];
+            } else if (assessment_type === "LS1MO1") {
+                header = ["Name", "Email", "Education", "Assessment", "Institute", "Subject", "Permanent Bad (PmB)", "Permanent Good (PmG)", "Pervasiveness Bad (PvB)", "Pervasiveness Good (PvG)", "Hope Score (HoB)", "Personalization Bad (PsB)", "Personalization Good (PsG)", "Total B", "Total G", "Total G-B", "Level", "Sub Level", "Start Time", "End Time", "Duration", "View"];
+            } else if (assessment_type === "LS1FS1") {
+                header = ["Name", "Email", "Education", "Assessment", "Institute", "Subject", "Dismissing", "Disapproving", "Laissez Faire", "Emotion Coaching", "Level", "Sub Level", "Start Time", "End Time", "Duration", "View"];
+            } else {
+                header = ["Name", "Email", "Education", "Assessment", "Institute", "Subject", "Maximum Marks", "Marks", "Level","Sub Level", "Grade", "Start Time", "End Time", "Duration","View","Detail Report"];
+            }
+            const resultsTableBody = document.getElementById("results-table-body");
+            resultsTableBody.innerHTML = "";  // clear old results
+
+            const headerRow = document.createElement("tr");
+            header.forEach(title => {
+                const th = document.createElement("th");
+                th.textContent = title;
+                headerRow.appendChild(th);
+            });
+            const headerContainer = document.getElementById("results-table-header")
+            headerContainer.innerHTML = "";  // clear old header
+            headerContainer.appendChild(headerRow);
+
+            results.forEach(result => {
+                const row = document.createElement("tr");
+
+                const assessmentName = result?.assessment_name ?? ""
+                const assessmentSubject = getSubjectLabel(result.assessment_subject);
+                const assessmentLevel = result?.assessment_level ?? "";
+                const assessmentSubLevel = result?.assessment_sub_level ?? "";
+                const organizationName = result?.organization_name ?? "";
+                const education = result?.education ?? "";
+                const startTime = formatDateTime(result?.start_time);
+                const endTime = formatDateTime(result?.end_time);
+
+                let rowHtml = `
+                    <td>${result.name}</td>
+                    <td>${result.email}</td>
+                    <td>${education}</td>
+                    <td>${assessmentName}</td>
+                    <td>${organizationName}</td>
+                    <td>${assessmentSubject}</td>
+                `;
+
+                if (assessment_type === "LS1EIQ1") {
+                    rowHtml += `
+                        <td>${result.new_score.SA}</td>
+                        <td>${result.new_score.ME}</td>
+                        <td>${result.new_score.MO}</td>
+                        <td>${result.new_score.EP}</td>
+                        <td>${result.new_score.SS}</td>
+                        <td>${assessmentLevel}</td>
+                        <td>${assessmentSubLevel}</td>
+                        <td>${startTime}</td>
+                        <td>${endTime}</td>
+                        <td>${getDuration(result.start_time, result.end_time)}</td>
+                        <td>
+                            <form id="pdfForm${result.id}" action="/download_pdf/" method="post" style="display: none;">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                <input type="hidden" name="type" value="EIQ">
+                                <input type="hidden" name="name" value="${result.name}">
+                                <input type="hidden" name="date" value="${result.start_time}">
+                                <input type="hidden" name="self_awareness" value="${result.new_score.SA}">
+                                <input type="hidden" name="managing_emotions" value="${result.new_score.ME}">
+                                <input type="hidden" name="motivating_oneself" value="${result.new_score.MO}">
+                                <input type="hidden" name="empathy" value="${result.new_score.EP}">
+                                <input type="hidden" name="social_skill" value="${result.new_score.SS}">
+                            </form>
+                            <a href="#" onclick="document.getElementById('pdfForm${result.id}').submit();">Detail Report</a>
+                        </td>
+                    `;
+                } else if (assessment_type === "LS1MO1") {
+                    const total_HoB = result.new_score.PmB + result.new_score.PvB;
+                    const totalB = result.new_score.PmB + result.new_score.PvB + result.new_score.PsB;
+                    const totalG = result.new_score.PmG + result.new_score.PvG + result.new_score.PsG;
+                    const totalGB = totalG - totalB;
+                    rowHtml += `
+                        <td>${result.new_score.PmB}</td>
+                        <td>${result.new_score.PmG}</td>
+                        <td>${result.new_score.PvB}</td>
+                        <td>${result.new_score.PvG}</td>
+                        <td>${total_HoB}</td>
+                        <td>${result.new_score.PsB}</td>
+                        <td>${result.new_score.PsG}</td>
+                        <td>${totalB}</td>
+                        <td>${totalG}</td>
+                        <td>${totalGB}</td>
+                        <td>${assessmentLevel}</td>
+                        <td>${assessmentSubLevel}</td>
+                        <td>${startTime}</td>
+                        <td>${endTime}</td>
+                        <td>${getDuration(result.start_time, result.end_time)}</td>
+                        <td>
+                            <form id="pdfForm${result.id}" action="/download_pdf/" method="post" style="display: none;">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                <input type="hidden" name="type" value="MO">
+                                <input type="hidden" name="name" value="${result.name}">
+                                <input type="hidden" name="date" value="${result.start_time}">
+                                <input type="hidden" name="cal_pmb" value="${result.new_score.PmB}">
+                                <input type="hidden" name="cal_pmg" value="${result.new_score.PmG}">
+                                <input type="hidden" name="cal_pvb" value="${result.new_score.PvB}">
+                                <input type="hidden" name="cal_pvg" value="${result.new_score.PvG}">
+                                <input type="hidden" name="cal_psb" value="${result.new_score.PsB}">
+                                <input type="hidden" name="cal_psg" value="${result.new_score.PsG}">
+                                <input type="hidden" name="cal_hob" value="${total_HoB}">
+                                <input type="hidden" name="total_B" value="${totalB}">
+                                <input type="hidden" name="total_G" value="${totalG}">
+                                <input type="hidden" name="total_G_B" value="${totalGB}">
+                            </form>
+                            <a href="#" onclick="document.getElementById('pdfForm${result.id}').submit();">Detail Report</a>
+                        </td>
+                    `;
+                } else if (assessment_type === "LS1FS1") {
+                    let dismissing =  result.new_score.DM;
+                    let disapproving =  result.new_score.DAP;
+                    let laissez_faire =  result.new_score.LF;
+                    let emotion_coaching =  result.new_score.EC;
+
+
+                    let dismissing_percent = 0;
+                    let disapproving_percent = 0;
+                    let laissez_faire_percent = 0;
+                    let emotion_coaching_percent = 0;
+
+                    total_question_type.forEach(obj => {
+                        const category = obj["questions__category"];
+                        const count = parseInt(obj["count"]);
+
+                        if (category === "DM" && count !== 0) {
+                            dismissing_percent = +((dismissing / count) ).toFixed(2);
+                        } else if (category === "DAP" && count !== 0) {
+                            disapproving_percent = +((disapproving / count) ).toFixed(2);
+                        } else if (category === "LF" && count !== 0) {
+                            laissez_faire_percent = +((laissez_faire / count) ).toFixed(2);
+                        } else if (category === "EC" && count !== 0) {
+                            emotion_coaching_percent = +((emotion_coaching / count) ).toFixed(2);
+                        }
+                    });
+                    rowHtml += `
+                        <td>${dismissing_percent}</td>
+                        <td>${disapproving_percent}</td>
+                        <td>${laissez_faire_percent}</td>
+                        <td>${emotion_coaching_percent}</td>
+                        <td>${assessmentLevel}</td>
+                        <td>${assessmentSubLevel}</td>
+                        <td>${startTime}</td>
+                        <td>${endTime}</td>
+                        <td>${getDuration(result.start_time, result.end_time)}</td>
+                        <td>
+                            <form id="pdfForm${result.id}" action="/download_pdf/" method="post" style="display: none;">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                                <input type="hidden" name="type" value="FS">
+                                <input type="hidden" name="name" value="${result.name}">
+                                <input type="hidden" name="date" value="${result.start_time}">
+                                <input type="hidden" name="dismissing_percent" value="${dismissing_percent}">
+                                <input type="hidden" name="disapproving_percent" value="${disapproving_percent}">
+                                <input type="hidden" name="laissez_faire_percent" value="${laissez_faire_percent}">
+                                <input type="hidden" name="emotion_coaching_percent" value="${emotion_coaching_percent}">
+                            </form>
+                            <a href="#" onclick="document.getElementById('pdfForm${result.id}').submit();">Detail Report</a>
+                        </td>
+                    `;
+                }else {
+                    rowHtml += `
+                        <td>${assessment_max_marks}</td>
+                        <td>${result.new_score.total_score }</td>
+                        <td>${assessmentLevel}</td>
+                        <td>${assessmentSubLevel}</td>
+                        <td>${result.grade}</td>
+                        <td>${startTime}</td>
+                        <td>${endTime}</td>
+                        <td>${getDuration(result.start_time, result.end_time)}</td>
+                        <td>${`<a href="${BaseURL}${result.id}/">View Report</a>`}</td>
+                        <td>${`<a href="${DetailsURL}${result.id}/">Detail Report</a>`}</td>
+                    `;
+                }
+
+                row.innerHTML = rowHtml;
+                const resultsTableBody = document.getElementById("results-table-body");
+                resultsTableBody.appendChild(row);
+            });
+
+
+    if (results.length > 0) {
+    // Pagination
+
+   const pagination = document.getElementById("pagination");
+    pagination.innerHTML = ""; // Clear existing content
+
+    const nav = document.createElement("nav");
+    nav.setAttribute("aria-label", "Page navigation example");
+
+    const div_ul = document.createElement("ul");
+    div_ul.className = "pagination justify-content-center";
+
+    // Previous button
+    const prevLi = document.createElement("li");
+    prevLi.className = `page-item ${!data.previous ? "disabled" : ""}`;
+    const prevLink = document.createElement("a");
+    prevLink.className = "page-link";
+    prevLink.href = "#";
+    prevLink.tabIndex = "-1";
+    prevLink.innerText = "Previous";
+    prevLi.appendChild(prevLink);
+    div_ul.appendChild(prevLi);
+
+    const currentPage = data.current_page ; 
+    const totalPages = Math.ceil(data.count / 20); // assuming 20 per page
+
+    for (let i = 1; i <= totalPages; i++) {
+    const pageLi = document.createElement("li");
+    pageLi.className = `page-item ${i === currentPage ? "active" : ""}`;
+    const pageLink = document.createElement("a");
+    pageLink.className = "page-link";
+    pageLink.href = "#";
+    pageLink.innerText = i;
+
+    pageLink.addEventListener("click", () => {
+        const pageUrl = updateUrlPage(data.next || data.previous, i);
+        fetchResults(pageUrl);
+    });
+
+    pageLi.appendChild(pageLink);
+    div_ul.appendChild(pageLi);
+    }
+
+    // Next button
+    const nextLi = document.createElement("li");
+    nextLi.className = `page-item ${!data.next ? "disabled" : ""}`;
+    const nextLink = document.createElement("a");
+    nextLink.className = "page-link";
+    nextLink.href = "#";
+    nextLink.innerText = "Next";
+    nextLi.appendChild(nextLink);
+    div_ul.appendChild(nextLi);
+
+    // Append everything
+    nav.appendChild(div_ul);
+    pagination.appendChild(nav);
+
+    // Event listeners for prev/next
+    if (data.previous) {
+    prevLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        fetchResults(data.previous);
+    });
+    }
+
+    if (data.next) {
+    nextLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        fetchResults(data.next);
+    });
+    }
+
+    
+
+    // Helper: update the page number in URL
+    function updateUrlPage(url, newPage) {
+    if (!url) return "#";
+    const baseUrl = new URL(url);
+    baseUrl.searchParams.set("page", newPage);
+    return baseUrl.toString();
+    }
+
+
+    //for download_csv
+    const downloadCsv = document.getElementById("download_csv");
+    downloadCsv.innerHTML = `
+    <form method="post" action="{% url 'download_results_csv' %}">
+                {% csrf_token %}
+                <input type="hidden" name="assessment" value="${assessmentId}">
+                <button type="submit" class="btn btn-outline-primary">Download All Results</button>
+    </form>
+            <a href="{% url 'download_results_csv' %}"
+               class="btn btn-outline-primary">Download Filtered Results</a>`;
+
+
+    }
+
+
+
+        })
+        .catch(error => {
+            console.error("Error fetching results:", error);
+            document.getElementById("results-alert").innerHTML = "<p>Error loading results.</p>";
+        });
+
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchResults(`/api/assessment-list/${assessmentId}`);
+    });
+
+
+</script>
+
+{% endblock content %}

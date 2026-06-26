@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Generate Assessment
+{% endblock title %}
+{% block content %}
+<script>
+    window.SHOW_SUB_LEVEL = {{ SUBJECTS_HAVING_SUBLEVELS|safe }};
+    window.total_questions = {{ total_questions|safe }};
+    window.assessmentlevels = {{ ASSESSMENT_LEVELS|safe }};
+    window.subjects = {{ subjects|safe }};
+    window.sub_levels = {{ SUB_LEVELS|safe }};
+    window.MAP_SUBLEVELS_TO_SUBJECT = {{MAP_SUBLEVELS_TO_SUBJECT|safe}};
+</script>
+<script src="{% static 'js/generate-assessment.min.js' %}"></script>
+    <article class="container gap-4 my-5">
+        {% if messages %}
+            {% for message in messages %}
+                <div {% if message.tags %} class="alert my-2 {% if message.tags == "error" %} alert-danger {% else %} alert-{{ message.tags }} {% endif %}
+                     alert-dismissible
+                     fade
+                     show
+                     "
+                     {% endif %}
+                     role="alert">
+                    {{ message }}
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <section class="container-fluid d-flex justify-content-center gap-4 my-5">
+            <form method="post"
+                    action="{% url 'generate_assessment' %}"
+                    class="col-9"
+                    onsubmit="return validateForm(this, {{ total_questions|safe }})">
+                {% csrf_token %}
+
+                <!-- Name -->
+                <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" name="name" id="name" class="form-control" required aria-label="Name">
+                </div>
+
+                <!-- Level -->
+                <div class="mb-3">
+                <label for="level" class="form-label">Level</label>
+                <select name="level" id="level" class="form-control" required x-model="selectedLevel" aria-label="Level">
+                    {% for level in ASSESSMENT_LEVELS|slice:":-1" %}
+                    <option value="{{ level.0 }}">{{ level.1 }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+
+                <!-- Subject -->
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <select name="subject" id="subject" class="form-control" required aria-label="Subject" onchange="toggleSubLevel()">
+                        {% for subject in subjects %}
+                        <option value="{{ subject.value }}">{{ subject.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Multi Sublevel Distribution -->
+                <div class="mb-3" id="sublevel_distribution_section" style="display: none;">
+                    <label class="form-label">Sublevel-wise Question Distribution</label>
+                    <p class="mb-2 text-muted">
+                        Define question count for each sublevel (same subject + level).
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Sublevel</th>
+                                    <th>Text</th>
+                                    <th>Audio</th>
+                                    <th>Fill in the Blank</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sublevel_distribution_body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Question Types -->
+                <p>Select The Question Type</p>
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" name="text_question" id="text_question" class="form-check-input" onclick="toggleInput('text_question')">
+                    <label for="text_question" class="form-check-label">Text Question</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" name="audio_question" id="audio_question" class="form-check-input" onclick="toggleInput('audio_question')">
+                    <label for="audio_question" class="form-check-label">Audio Question</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" name="fill_in_the_blank" id="fill_in_the_blank" class="form-check-input" onclick="toggleInput('fill_in_the_blank')">
+                    <label for="fill_in_the_blank" class="form-check-label">Fill in the Blank</label>
+                </div>
+
+                <div id="text_question_input" class="mb-3" style="display: none;">
+                    <label for="text_question_count" class="form-label">Number of Text Questions</label>
+                    <input type="number" name="text_question_count" id="text_question_count" class="form-control" min="0" value="0">
+                </div>
+
+                <div id="audio_question_input" class="mb-3" style="display: none;">
+                    <label for="audio_question_count" class="form-label">Number of Audio Questions</label>
+                    <input type="number" name="audio_question_count" id="audio_question_count" class="form-control" min="0" value="0">
+                </div>
+
+                <div id="fill_in_the_blank_input" class="mb-3" style="display: none;">
+                    <label for="fill_in_the_blank_count" class="form-label">Number of Fill in the Blank Questions</label>
+                    <input type="number" name="fill_in_the_blank_count" id="fill_in_the_blank_count" class="form-control" min="0" value="0">
+                </div>
+                <input type="hidden" name="sublevel_distribution_json" id="sublevel_distribution_json" value="">
+
+
+                <!-- Shuffle Q&A -->
+                <div class="mb-3 mt-2">
+                <label for="shuffle_question_and_answer" class="form-label">Shuffle Questions and Answers?</label>
+                <select name="shuffle_question_and_answer" id="shuffle_question_and_answer" class="form-control" required x-model="shuffle_question" aria-label="Shuffle the question and answer">
+                    <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
+                </div>
+
+                <!-- Show Correct Answer -->
+                <div class="mb-3">
+                <label for="show_correct_answer_to_the_student" class="form-label">Show Correct Answer to the Student?</label>
+                <select name="show_correct_answer_to_the_student" id="show_correct_answer_to_the_student" class="form-control" required x-model="correct_answer" aria-label="Show correct answer to the Student">
+                    <option value="False">No</option>
+                    <option value="True">Yes</option>
+                </select>
+                </div>
+
+                <button type="submit" class="btn btn-outline-primary">Generate Assessment</button>
+            </form>
+            <section class="col-3 d-none" id="question-count-section">
+                <p class="mb-3">Total No of question for each level are as follows.</p>
+                <ul class="list-group" id="question-count-list"></ul>
+            </section>
+            {% comment %} {% for subject, levels in total_questions.items %}
+                        <li class="list-group-item mb-3">
+                            <span aria-label="Subject">{{ subject }}</span>
+                            {% for level, count in levels.items %}
+                            <pre class="mb-0">{{ level }}: Text {{ count.text_question }} Audio {{ count.audio_question }} Fillup {{ count.fillup }}  </pre>
+                            {% for sub_level, sub_count in count.sub_levels.items %}
+                            {% if sub_count.text_question > 0 or sub_count.audio_question > 0 or sub_count.fillup > 0 %}
+                            <pre class="mb-0">  {{ sub_level }}: Text {{ sub_count.text_question }} Audio {{ sub_count.audio_question }} Fillup {{ sub_count.fillup }}  </pre>
+                            {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        </li>
+                    {% endfor %} {% endcomment %}
+        </section>
+    </article>
+{% endblock content %}

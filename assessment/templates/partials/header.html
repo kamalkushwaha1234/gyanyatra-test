@@ -1,0 +1,92 @@
+<style>
+    .logo{
+        display: none;
+    }
+    .mobile_logo{
+        display: block;
+    }
+    @media screen and (min-width: 992px) {
+        .logo {
+            display: block;
+        }
+        .mobile_logo{
+            display: none;
+        }
+    }
+</style>
+{% load static %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {% include "partials/mobile-logo.html" %}
+        <div class="collapse navbar-collapse" id="navbarNav">
+            {% if request.user.is_superuser or request.user.is_creator %}
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "assessment_list" %}">All Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "display_all_questions" %}">All Questions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "generate_assessment" %}">Generate assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "organization_report" %}">Report</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "m4a_to_mp3_tool" %}">Tool</a>
+                    </li>
+                </ul>
+            {% endif %}
+            {% include "partials/logo.html" %}
+            <ul class="navbar-nav ms-auto">
+                {% if not request.user.is_authenticated %}
+                <li class="nav-item">
+                        <a class="nav-link" href="{% url "m4a_to_mp3_tool" %}">Tool</a>
+                </li>
+                {% endif %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownConnect" role="button"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Help & Support
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownConnect">
+                        <a class="dropdown-item" href="https://www.youtube.com/playlist?list=PLapATQLY4qJuSdpMQlo41VX-qyFOqcYtX"
+                        target="_blank" 
+                        rel="noopener noreferrer">User Manual Video
+                        </a>
+                        
+                        <a class="dropdown-item" 
+                        href='{% static "usermanual/Gyanyatra_Assessment_User_Manual.pdf" %}'
+                        target="_blank" 
+                        rel="noopener noreferrer">
+                        User Manual (PDF)
+                        </a> 
+                  </div>
+                </li>
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "signout" %}" aria-label="Sign Out">Sign Out</a>
+                    </li>
+                {% else %}
+                <li class="nav-item">
+                        <a class="nav-link" href="{% url "signin" %}" aria-label="Sign In">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "signup" %}" aria-label="Sign Up">Sign Up</a>
+                </li>
+                    
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

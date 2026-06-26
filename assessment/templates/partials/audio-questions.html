@@ -1,0 +1,42 @@
+<div x-show="field.type === 'audio'" :data-index="index + 1">
+    <label for="audio-question" class="form-label"> Question <span x-text="index +1 "></span></label>
+    <template x-if="field.having_assessment == 'True'">
+            <p class="text-danger fw-bold">This question is part of an assessment. You cannot add, remove, or change the audio file or the answer</p>
+    </template>
+    <template x-if="field.having_assessment == 'False'">
+            <p class="mt-2">Upload  Audio File</p>
+    </template>
+    <div class="mb-3 d-flex gap-3 align-items-center">
+        <input type="file"
+               accept="audio/*"
+               class="form-control w-25"
+               id="audio-question"
+               :disabled="field.having_assessment == 'True'"
+               x-bind:name="'audio-question-' + field.audio_id "
+               x-on:change="updateAudioPreview($event, index)">
+        <input type="hidden" name="audio-id" x-model="field.audio_id">
+        <audio x-show="field.audio_question"
+               class="w-50"
+               id="track"
+               controls
+               :src="field.audio_question"></audio>
+    </div>
+    <label class="form-label" for="audio-answer">Enter Answer</label>
+    <textarea required
+              type="text"
+              placeholder="Enter Answer"
+              x-model="field.answer"
+              @input="
+            if (/[^\w\s]/gi.test($event.target.value)) {
+              alert('Special characters are not allowed in the answer.');
+              field.answer = field.answer.replace(/[^\w\s]/gi, '');
+            }
+          "
+              id="audio-answer"
+              name="audio-answer"
+              class="form-control mb-3"
+              :readonly="field.having_assessment == 'True'"></textarea>
+    <template x-if="field.type === 'audio'">
+        <input type="hidden" x-model="field.correct" name="correct">
+    </template>
+</div>

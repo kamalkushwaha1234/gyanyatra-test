@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    {{ title }}
+{% endblock title %}
+{% block content %}
+    {% include "partials/content.js.html" %}
+    <article class="d-flex justify-content-center flex-column container">
+
+        {% if not edit %}
+        <div class="justify-content-end d-flex gap-3 mt-4 mr-3 pe-4">
+            <input type="file"
+                    id="import-template-file"
+                    accept=".xlsx,.xls,.csv"
+                    class="d-none">
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    onclick="downloadSampleTemplate()">
+                Sample Template
+            </button>
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    onclick="triggerImportQuestions()">
+                Import Questions
+            </button>
+        </div>
+        {% endif %}
+        <form action=""
+              x-data="{ selectedlevel: '{{ selectedlevel }}' ,
+              selectedSubject: '{{ selectedsubject }}',
+              selectedsublevel: '{{ selectedsublevel}}',
+              mapSubLevels: {{ MAP_SUBLEVELS_TO_SUBJECT}},
+              categories: {{ categories }},
+              lifeskillCategory: ['LS1FS1', 'LS1MO1', 'LS1EIQ1'],
+              lifeskillCorrect: ['G1L1', 'G1L2','G1L3','GReflexL1','GSlL1','G2L1','G2L2','G2L3','G3L1','G3L2','G3L3','LS1MO1','LS1FS1','CS'],
+              having_assessment: '{{ having_assessment }}',
+              hasSubLevel() {
+                        return Object.keys(this.mapSubLevels).includes(this.selectedSubject);
+                    }
+              }
+              "
+              method="post"
+              class="my-5"
+              name="contentForm"
+              novalidate
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3 form-check">
+                <label for="content" class="form-label">Enter Content</label>
+                <div id="contentEditor" aria-label="Content Input">
+                    <div id="content-toolbar" class="ql-toolbar ql-snow"></div>
+                    {{content.content|safe }}
+                </div>
+                <textarea name="content" id="content" style="display:none;"></textarea>
+                <label for="level" x-data="{ selectedlevel: '{{ selectedlevel }}'}" class="form-label">Choose the Group and Level</label>
+                <select required
+                        x-model="selectedlevel"
+                        class="form-select mb-3"
+                        name="level"
+                        aria-label="Select the Group and Level"
+                        id="level">
+                        <option value="" disabled {% if not questions %}selected{% endif %}>Please Select the level</option>
+                        {% for level in levels %}
+                            <option value="{{ level.0 }}"
+                                {% if questions and questions.0.level == level.0 %}selected{% endif %}>
+                                {{ level.1 }}
+                            </option>
+                        {% endfor %}
+                    
+                    
+                </select>
+                <!-- Subject Dropdown -->
+                <label for="level" class="form-label">Choose Subject of Questions</label>
+                <select required
+                        class="form-select mb-3"
+                        name="subject"
+                        aria-label="Select Subject of Questions"
+                        id="subject"
+                        x-model="selectedSubject"
+                        x-init="oldSubject = selectedSubject"
+                        @change="
+                            if (having_assessment == 'True') {
+                                alert('You cannot change the subject while the assessment is active.');
+                                selectedSubject = oldSubject;
+                            } else {
+                                oldSubject = selectedSubject;
+                            }
+                        ">
+                    {% for subject in subjects %}
+                        <option value="{{ subject.value }}" {% if selectedsubject == subject.value %}selected{% endif %}>
+                            {{ subject.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                 <!-- Sub Level Dropdown (conditionally visible) -->
+                    <div x-show="hasSubLevel()" x-transition>
+                        <label for="sub_level" class="form-label">Choose the Sub Level</label>
+                        <select required
+                                x-model="selectedsublevel"
+                                class="form-select mb-3"
+                                name="sub_level"
+                                aria-label="Select the Sub Level"
+                                id="sub_level">
+                            <option value="" disabled >
+                                Please Select the Sub Level
+                            </option>
+                            <template x-for="level in mapSubLevels[selectedSubject]" :key="level[0]">
+                                <option :value="level[0]" x-text="level[1]" :selected="level[0] === selectedsublevel" ></option>
+                            </template>
+                        </select>
+                    </div>
+                
+
+            </div>
+            <div class="container"
+                 x-data="mixedContentTemplate() "
+                 x-init="window.mixedContentState = $data">
+                <template x-for="(field, index) in fields" :key="index">
+                    <fieldset>
+                        <div class="mb-3 form-check col-10">
+                            <template x-if="field.type === 'question'">
+                                {% include "partials/questions.html" %}
+                            </template>
+                            <template x-if="field.type === 'audio'">
+                                {% include "partials/audio-questions.html" %}
+                            </template>
+                            <template x-if="field.type === 'fillup'">
+                                {% include "partials/fillup-questions.html" %}
+                            </template>
+                            <button type="button"
+                                    class="btn btn-outline-danger"
+                                    :disabled="field.having_assessment == 'True'"
+                                    @click.prevent="removeMixedField(index)"
+                                    x-show="fields.length > 1">Remove</button>
+                        </div>
+                    </fieldset>
+                </template>
+                <div class="justify-content-end d-flex gap-3">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            Add Questions
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="#" @click.prevent="addNewQuestionField()" aria-label="Add Questions" >Add Text Question</a></li>
+                            <li><a class="dropdown-item" href="#" @click.prevent="addNewAudioField()" aria-label="Add Audio Question">Add Audio Question</a></li>
+                            <li><a class="dropdown-item" href="#" @click.prevent="addNewfillupField()" aria-label="Add Fillup Question" >Add FillUp Question</a></li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" onclick="submitForm(this.form, event)">Submit</button>
+                </div>
+            </div>
+        </form>
+        
+    </article>
+    <script>
+        window.ADD_EDIT_CONTENT_CONFIG = {
+            levelCodes: {{ levels|safe }}.map((x) => x[0]),
+            subjects: {{ subjects|safe }},
+            subLevelCodes: {{ sub_levels|safe }}.map((x) => x[0]),
+            mapSubLevelsToSubject: {{ MAP_SUBLEVELS_TO_SUBJECT|safe }},
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="{% static 'js/add-edit-content.js' %}"></script>
+
+{% endblock content %}

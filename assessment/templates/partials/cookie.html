@@ -1,0 +1,186 @@
+<style>
+    #cookieConsent {
+        z-index: 9999;
+        display: none; /* Controlled by JS */
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1.5rem; /* Adds breathing room around the banner on desktop */
+        pointer-events: none; /* Allows clicks to pass through the container background */
+    }
+
+    #cookieConsent .cookie-banner {
+        pointer-events: auto; /* Re-enables clicks for the banner itself */
+        max-width: 600px; /* Constrains width on laptop so it doesn't look like a giant bar */
+        margin: 0 auto;
+        background: #d9e4ff;
+        color: #111;
+        border: 1px solid rgba(17, 24, 39, 0.1);
+        border-radius: 1.25rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    #cookieConsent .cookie-banner-inner {
+        position: relative;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+    }
+
+    #cookieConsent .cookie-banner-content {
+        flex: 1;
+    }
+
+    #cookieConsent .cookie-heading {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    #cookieConsent .cookie-description {
+        font-size: 0.875rem;
+        line-height: 1.4;
+        margin: 0;
+        color: #374151;
+    }
+
+    #cookieConsent .cookie-actions {
+        flex-shrink: 0;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 576px) {
+        #cookieConsent {
+            padding: 0.75rem;
+            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+        }
+
+        #cookieConsent .cookie-banner-inner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem 1rem;
+        }
+
+        #cookieConsent .cookie-actions, 
+        #cookieConsent #acceptCookies {
+            width: 100%;
+        }
+        
+        #cookieConsent .cookie-banner-content {
+            padding-right: 1.5rem; /* Leave room for X button */
+        }
+    }
+</style>
+
+<div id="cookieConsent" role="region" aria-label="Cookie Consent">
+    <div class="cookie-banner" role="alertdialog" aria-labelledby="cookieHeading" aria-describedby="cookieDescription">
+        <div class="cookie-banner-inner">
+            <div class="cookie-banner-content">
+                <span class="cookie-heading" id="cookieHeading">We use cookies 🍪</span>
+                <p class="cookie-description" id="cookieDescription">
+                    We use them to improve your experience. By clicking "Accept," you agree to our cookie policy.
+                </p>
+            </div>
+
+            <div class="cookie-actions">
+                <button id="acceptCookies" class="btn btn-primary btn-sm px-4 fw-bold">Accept</button>
+            </div>
+
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" 
+                    style="font-size: 0.7rem;" aria-label="Close" id="dismissCookie"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cookie Consent Management with Accessibility
+    document.addEventListener('DOMContentLoaded', function() {
+        const cookieConsent = document.getElementById('cookieConsent');
+        const acceptButton = document.getElementById('acceptCookies');
+
+        if (!cookieConsent || !acceptButton) {
+            return;
+        }
+
+        const closeButton = cookieConsent.querySelector('.btn-close');
+        const COOKIE_KEY = 'prishni_cookie_consent_accepted';
+        const COOKIE_EXPIRY_DAYS = 2;
+
+        // Check if user has already accepted cookies
+        const cookieAccepted = localStorage.getItem(COOKIE_KEY);
+
+        if (!cookieAccepted) {
+            // Show banner if not accepted
+            cookieConsent.style.display = 'block';
+
+            // Set focus to accept button for keyboard navigation
+            setTimeout(() => {
+                acceptButton.focus();
+            }, 100);
+
+            // Announce to screen readers
+            const announcement = document.createElement('div');
+            announcement.className = 'visually-hidden';
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'assertive');
+            announcement.textContent = 'Cookie consent notice has appeared. Press Tab to navigate to buttons, then Enter to activate.';
+            document.body.appendChild(announcement);
+
+            setTimeout(() => {
+                announcement.remove();
+            }, 5000);
+        }
+
+        // Handle Accept button click
+        acceptButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Store acceptance in localStorage
+            localStorage.setItem(COOKIE_KEY, 'true');
+
+            // Set cookie to allow server-side verification
+            const date = new Date();
+            date.setTime(date.getTime() + (COOKIE_EXPIRY_DAYS * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = COOKIE_KEY + "=true;" + expires + ";path=/";
+
+            // Announce to screen readers
+            const announcement = document.createElement('div');
+            announcement.className = 'visually-hidden';
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.textContent = 'Cookies have been accepted.';
+            document.body.appendChild(announcement);
+
+            // Hide banner
+            cookieConsent.style.display = 'none';
+
+            setTimeout(() => {
+                announcement.remove();
+            }, 3000);
+
+            console.log('User accepted cookies');
+        });
+
+        // Handle Close/Dismiss button
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                // Announce to screen readers
+                const announcement = document.createElement('div');
+                announcement.className = 'visually-hidden';
+                announcement.setAttribute('role', 'status');
+                announcement.setAttribute('aria-live', 'polite');
+                announcement.textContent = 'Cookie notice dismissed. Please note you may be asked again on your next visit.';
+                document.body.appendChild(announcement);
+
+                setTimeout(() => {
+                    announcement.remove();
+                }, 3000);
+            });
+        }
+    });
+</script>

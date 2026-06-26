@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% block title %}
+    {{ assessment_result.name }}'s Result
+{% endblock title %}
+
+{% block content %}
+<div class="container my-5" aria-label="Assessment Result Section" id="report-container">
+    <!-- Filled by JS -->
+</div>
+<div id="error-container"></div>
+<script>
+const assessmentResult = JSON.parse('{{ assessment_result_json|default:"{}"|escapejs }}');
+const questions = JSON.parse('{{ questions_json|default:"[]"|escapejs }}');
+const errorMessage = "{{ error|default:''|escapejs }}";
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (errorMessage) {
+        const errorDiv = document.getElementById("error-container");
+        errorDiv.innerHTML = `
+            <div class="alert alert-danger" role="alert" aria-label="Error Message">
+                ${errorMessage}
+            </div>
+        `;
+        return;
+    }
+    if (!assessmentResult || !questions) {
+        const errorDiv = document.getElementById("error-container");
+        errorDiv.innerHTML = `
+            <div class="alert alert-warning" role="alert" aria-label="Data Not Found Message">
+                Assessment result data is not available.
+            </div>
+        `;
+        return;
+    }
+    const container = document.getElementById("report-container");
+
+    // --- Assessment Header ---
+    const header = document.createElement("h2");
+    header.className = "mb-4";
+    header.setAttribute("aria-label", "Assessment Report Header");
+    header.innerText = "Assessment Report";
+    container.appendChild(header);
+
+    // --- Student Info ---
+    const studentInfo = document.createElement("div");
+    studentInfo.className = "mb-4";
+    studentInfo.setAttribute("aria-label", "Student Information");
+    const score = assessmentResult.score.total_score;
+    
+
+    studentInfo.innerHTML = `
+        <p class="fs-5"><strong>Name:</strong> <span aria-label="${assessmentResult.name}">${assessmentResult.name}</span></p>
+        <p class="fs-5"><strong>Email:</strong> <span aria-label="${assessmentResult.email}">${assessmentResult.email}</span></p>
+        <p class="fs-5"><strong>Grade:</strong> <span aria-label="${assessmentResult.grade}">${assessmentResult.grade}</span></p>
+        <p class="fs-5"><strong>Max Marks:</strong> <span aria-label="${assessmentResult.total_questions}">${assessmentResult.total_questions}</span></p>
+        <p class="fs-5"><strong>Marks Obtained:</strong> <span aria-label="${score}"> ${score}</span></p>
+    `;
+    container.appendChild(studentInfo);
+
+    // --- Question Breakdown Header ---
+    const qHeader = document.createElement("h3");
+    qHeader.className = "mb-3";
+    qHeader.setAttribute("aria-label", "Question Breakdown Header ");
+    qHeader.innerText = "Question Breakdown ";
+    container.appendChild(qHeader);
+
+    // --- Questions Loop ---
+    questions.forEach((q, index) => {
+        const card = document.createElement("div");
+        card.className = "card mb-4 shadow-sm";
+        card.setAttribute("aria-label", `Question ${index + 1}`);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+
+
+        //for text question
+        if (q.type === "text_question") {
+            const title = document.createElement("h4");
+            const questionText = `Q${index + 1}: ${q.question}`;
+            title.className = "card-title mb-3";
+            title.setAttribute("aria-label", `Text Question ${questionText}`);
+            title.innerText = `${questionText}`;
+            body.appendChild(title);
+
+            const ul = document.createElement("ul");
+            ul.className = "list-group";
+            ul.setAttribute("aria-label", "Answer Options");
+
+            let mask_text = 0;
+
+            q.options.forEach(optText => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center fw-semibold";
+
+                const textDiv = document.createElement("span");
+                textDiv.innerText = optText;
+                li.appendChild(textDiv);
+
+                const badgeContainer = document.createElement("div");
+
+                // Background and mask condition
+                if (optText === q.selected_option && optText === q.correct_option) {
+                    li.style.backgroundColor = '#d9e4ff'; // Correct
+                    li.style.color = 'black';
+                    mask_text = 1;
+                } else if (optText === q.selected_option) {
+                    li.style.backgroundColor = '#fcc9b5'; // Wrong
+                    li.style.color = 'black';
+                } else if (optText === q.correct_option) {
+                    li.style.backgroundColor = '#e6ffe6'; // Highlight correct
+                    li.style.color = 'black';
+                }
+
+                // Badges
+                if (optText === q.selected_option) {
+                    const selectedBadge = document.createElement("span");
+                    selectedBadge.className = "badge bg-secondary me-2";
+                    selectedBadge.innerText = "Chosen Answer";
+                    selectedBadge.setAttribute("aria-label", "Your Selected Answer");
+                    badgeContainer.appendChild(selectedBadge);
+                }
+                if (optText === q.correct_option) {
+                    const correctBadge = document.createElement("span");
+                    correctBadge.className = "badge bg-success";
+                    correctBadge.innerText = "Correct Answer";
+                    correctBadge.setAttribute("aria-label", "Correct Answer");
+                    badgeContainer.appendChild(correctBadge);
+                }
+
+                li.appendChild(badgeContainer);
+                ul.appendChild(li);
+            });
+            const mask_html = document.createElement("div");
+            mask_html.innerHTML = `<strong> Mark : ${mask_text}</strong>`;
+            mask_html.className = "mt-2 fs-5 mb-1 fst-normal";
+            body.appendChild(mask_html);
+
+            body.appendChild(ul);
+
+            
+
+            card.appendChild(body);
+            container.appendChild(card);
+        }
+
+
+
+        //for fillup
+        if (q.type === "fillup_question") {
+            const title = document.createElement("h4");
+            const fillupquestiontext = `Q${index + 1}: ${q.question}`;
+            title.className = "card-title mb-3";
+            title.setAttribute("aria-label", `Question Fill in the Blank ${fillupquestiontext}`);
+            title.innerText = `${fillupquestiontext}`;
+            body.appendChild(title);
+
+            const ul = document.createElement("ul");
+            ul.className = "list-group";
+
+            let mask_fill = 0;
+
+            for (const key in q.correct_option) {
+                const correct = q.correct_option[key] ?? "";
+                const selected = q.selected_option[key] ?? "";
+
+                const correctNormalized = correct.trim();
+                const selectedNormalized = selected.trim();
+
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-start";
+
+                const textDiv = document.createElement("div");
+                textDiv.className = "ms-2 me-auto";
+
+                const wordLabel = document.createElement("div");
+                wordLabel.className = "fw-bold";
+                wordLabel.innerText = key;
+
+                const yourAnswer = document.createElement("span");
+                yourAnswer.innerHTML = `Your Answer: <strong>${selected}</strong><br>Correct: <strong>${correct}</strong>`;
+
+                textDiv.appendChild(wordLabel);
+                textDiv.appendChild(yourAnswer);
+                li.appendChild(textDiv);
+
+                // Badge / Status
+                const badge = document.createElement("span");
+                badge.className = "badge rounded-pill";
+                if (correctNormalized === selectedNormalized) {
+                    badge.classList.add("bg-success");
+                    badge.innerText = "Correct";
+                    mask_fill++;
+                    li.style.backgroundColor = "#e6f3ff";
+                } else {
+                    badge.classList.add("bg-danger");
+                    badge.innerText = "Wrong";
+                    li.style.backgroundColor = "#ffe6e6";
+                }
+
+                li.appendChild(badge);
+                ul.appendChild(li);
+            }
+            // Mask score box
+            const mask_html = document.createElement("div");
+            mask_html.innerHTML = `<strong> Mark : ${mask_fill}</strong>`;
+            mask_html.className = "mt-2 fs-5 mb-1 fst-normal";
+            body.appendChild(mask_html);
+
+            body.appendChild(ul);
+
+            card.appendChild(body);
+            container.appendChild(card);
+        }
+
+
+        //for Audio Question
+        if (q.type === "audio_question") {
+            const title = document.createElement("h4");
+            const audiolabel = `Q${index + 1}: Listen to the audio question`;
+            title.className = "card-title mb-3";
+            title.setAttribute("aria-label", `Audio Question ${audiolabel}`);
+            title.innerText = `${audiolabel}`;
+            body.appendChild(title);
+
+            // Audio Player
+            const audio = document.createElement("audio");
+            audio.controls = true;
+            const mediaBaseURL =  q.url;
+            audio.src = mediaBaseURL;
+            audio.className = "w-100 mb-3";
+            audio.setAttribute("aria-label", "Audio Playback");
+            body.appendChild(audio);
+
+            // Word-by-word comparison
+            const selectedWords = (q.selected_option || "").trim().split(/\s+/);
+            const correctWords = (q.correct_option || "").trim().split(/\s+/);
+            const ul = document.createElement("ul");
+            ul.className = "list-group";
+            ul.setAttribute("aria-label", "Audio Answers");
+
+            let correctCount = 0;
+
+            const maxLength = Math.max(selectedWords.length, correctWords.length);
+
+            for (let i = 0; i < maxLength; i++) {
+                const selected = selectedWords[i] || "";
+                const correct = correctWords[i] || "";
+
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-start";
+
+                const textDiv = document.createElement("div");
+                textDiv.className = "ms-2 me-auto";
+
+                const wordLabel = document.createElement("div");
+                wordLabel.className = "fw-bold";
+                wordLabel.innerText = `Word ${i + 1}`;
+
+                const yourAnswer = document.createElement("span");
+                yourAnswer.innerHTML = `Your Answer: <strong>${selected}</strong><br>Correct: <strong>${correct}</strong>`;
+
+                textDiv.appendChild(wordLabel);
+                textDiv.appendChild(yourAnswer);
+                li.appendChild(textDiv);
+
+                const badge = document.createElement("span");
+                badge.className = "badge rounded-pill";
+
+                if (selected.toLowerCase() === correct.toLowerCase()) {
+                    badge.classList.add("bg-success");
+                    badge.innerText = "Correct";
+                    li.style.backgroundColor = "#e6f3ff";
+                    correctCount++;
+                } else {
+                    badge.classList.add("bg-danger");
+                    badge.innerText = "Wrong";
+                    li.style.backgroundColor = "#ffe6e6";
+                }
+
+                li.appendChild(badge);
+                ul.appendChild(li);
+            }
+
+            const markDiv = document.createElement("div");
+            markDiv.innerHTML = `<strong>Mark: ${correctCount}</strong>`;
+            markDiv.className = "mt-2 fs-5 mb-1 fst-normal";
+            body.appendChild(markDiv);
+
+            body.appendChild(ul);
+            card.appendChild(body);
+            container.appendChild(card);
+        }
+
+
+
+
+       
+    });
+});
+function compareSentences(sentence1, sentence2) {
+    const words1 = sentence1.trim().split(/\s+/);
+    const words2 = sentence2.trim().split(/\s+/);
+    
+    const maxLength = Math.max(words1.length, words2.length);
+
+    let mask=0
+    for (let i = 0; i < maxLength; i++) {
+        const word1 = words1[i] || '';
+        const word2 = words2[i] || '';
+        
+        if (word1 === word2) {
+            mask=mask+1
+        } 
+    }
+
+    return mask;
+}
+    
+</script>
+
+{% endblock content %}

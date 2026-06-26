@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ assessment_result.name }}'s Result
+{% endblock title %}
+
+{% block content %}
+<div id="responsive-container">
+  {% if messages %}
+                    {% for message in messages %}
+                        <div id="alert-{{ forloop.counter }}"
+                             tabindex="0"
+                             aria-live="polite"
+                             class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                             role="alert"
+                             aria-label="{{ message }}">
+                            {{ message }}
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    <div class="justify-content-center text-center mb-4 mt-2">
+      <h1>MO Assessment Report </h1>
+    </div>
+
+    <div class="mt-5">
+        <h2 class="text-center">Scoring Key</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered text-center mt-3">
+                <thead>
+                    <tr>
+                        <th>PmB</th>
+                        <th>PmG</th>
+                        <th>PvB</th>
+                        <th>PvG</th>
+                        <th>PsB</th>
+                        <th>PsG</th>
+                        <th>HoB</th>
+                        <th>Total B</th>
+                        <th>Total G</th>
+                        <th>G - B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{assessment_result.new_score.PmB}}</td>
+                        <td>{{assessment_result.new_score.PmG}}</td>
+                        <td>{{assessment_result.new_score.PvB}}</td>
+                        <td>{{assessment_result.new_score.PvG}}</td>
+                        <td>{{assessment_result.new_score.PsB}}</td>
+                        <td>{{assessment_result.new_score.PsG}}</td>
+                        <td id="score-total_hob"></td>
+                        <td id="score-total_B"></td>
+                        <td id="score-total_G"></td>
+                        <td id="score-total_G_B"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        
+    </div>
+
+    <div class="mt-5">
+        <h4>Interpreting the Overall Totals</h4>
+        <p id="interpretationText" class="fs-5"></p>
+
+        <h2 class="text-center ">Scoring the Optimism Questionnaire</h2>
+        <p class="fs-5">
+            Seven categories are measured on the Optimism Questionnaire and one overall combined score reflects your level of optimism. 
+            Score each category separately first and then determine the final combined score.
+        </p>
+        <ul class="fs-5">
+            <li class="mt-4"><strong>PmB (Permanent Bad):</strong> Believing the causes of bad events are permanent. If you totaled 0 or 1, you are very optimistic on this dimension. 2 or 3 is a moderately optimistic score; 4 is average; 5 or 6 is quite pessimistic; and 7 or 8 is very pessimistic.</li>
+            <li class="mt-4"><strong>PmG (Permanent Good):</strong> Believing the causes of good events are permanent.  If you totaled 7 or 8, you are very optimistic. 6 is a moderately optimistic score; 4 or 5 is average; 3 is a moderately pessimistic score; and 0, 1, or 2 is very pessimistic.</li>
+            <li class="mt-4"><strong>PvB (Pervasiveness Bad):</strong> Believing failures are universal and extend beyond the situation.   If you totaled 0 or 1, you are very optimistic on this dimension. 2 or 3 is a moderately optimistic score; 4 is average; 5 or 6 is quite pessimistic; and 7 or 8 is very pessimistic.</li>
+            <li class="mt-4"><strong>PvG (Pervasiveness Good):</strong> Believing good events are universal and extend beyond the situation.  If you totaled 7 or 8, you are very optimistic. 6 is a moderately optimistic score; 4 or 5 is average; 3 is a moderately pessimistic score; and 0, 1, or 2 is very pessimistic.</li>
+            <li class="mt-4"><strong>HoB (Hope Score):</strong> A combination of pervasive and permanent beliefs about bad events.  This will yield your hope score for bad events. If it is a 0, 1, or 2, you are extraordinarily hopeful. 3, 4, 5, or 6 is a moderately hopeful score; 7 or 8 is average; 9, 10, or 11 is moderately hopeless; and 12, 13, 14, 15, or 16 is severely hopeless.</li>
+            <li class="mt-4"><strong>PsB (Personalization Bad):</strong> Believing faults are personal and internal and, therefore, difficult to change.  If you totaled 0 or 1, you have very high self-esteem. 2 or 3 is a moderately optimistic score; 4 is average; 5 or 6 indicates low self-esteem; and 7 or 8 indicates very low self-esteem.</li>
+            <li class="mt-4"><strong>PsG (Personalization Good):</strong> Believing faults are external and not personal. If you totaled 7 or 8, you are very optimistic. 6 is a moderately optimistic score; 4 or 5 is average; 3 is a moderately pessimistic score; and 0, 1, or 2 is very pessimistic.</li>
+        </ul>
+        
+    </div>
+    <div class="mb-4">
+        <form action="{% url 'download_pdf' %}" method="post" >
+          {% csrf_token %}
+          <input type="hidden" name="type" value="MO">
+          <input type="hidden" name="date" value="{{ assessment_result.date }}">
+          <input type="hidden" name="name" value="{{ assessment_result.name }}">
+          <input type="hidden" name="disabiliity" value="{{ assessment_result.disabiliity }}">
+          <input type="hidden" name="cal_pmb" value="{{ assessment_result.new_score.PmB }}">
+          <input type="hidden" name="cal_pmg" value="{{ assessment_result.new_score.PmG }}">
+          <input type="hidden" name="cal_pvb" value="{{ assessment_result.new_score.PvB }}">
+          <input type="hidden" name="cal_pvg" value="{{ assessment_result.new_score.PvG }}">
+          <input type="hidden" name="cal_psb" value="{{ assessment_result.new_score.PsB }}">
+          <input type="hidden" name="cal_psg" value="{{ assessment_result.new_score.PsG }}">
+          <input type="hidden" name="cal_hob" id="input-total_hob" >
+          <input type="hidden" name="total_B" id="input-total_B" >
+          <input type="hidden" name="total_G" id="input-total_G" >
+          <input type="hidden" name="total_G_B" id="input-total_G_B" >
+          <button type="submit" class="btn mt-4" style="background-color: #a8a8a8; color: black;" aria="Generate Detail Report">Generate Detail Report</button>
+        </form>
+    </div>
+
+    <style>
+        #responsive-container {
+            padding: 0 1rem; 
+            margin-top: 2rem;
+          }
+          
+          @media (min-width: 992px) { 
+            #responsive-container {
+              margin-left: 100px;
+              margin-right: 200px;
+              padding-left: 15px;
+              padding-right: 15px;
+              margin-top: 3rem;
+        
+            }
+          }
+    </style>
+
+    <script>
+
+        const total_HoB = {{assessment_result.new_score.PvB}}+{{assessment_result.new_score.PmB}};
+        const total_B = {{assessment_result.new_score.PmB}}+{{assessment_result.new_score.PvB}}+{{assessment_result.new_score.PsB}};
+        const total_G = {{assessment_result.new_score.PmG}}+{{assessment_result.new_score.PvG}}+{{assessment_result.new_score.PsG}};
+        const total_G_B = {{assessment_result.new_score.PmG}}+{{assessment_result.new_score.PvG}}+{{assessment_result.new_score.PsG}}-{{assessment_result.new_score.PmB}}-{{assessment_result.new_score.PvB}}-{{assessment_result.new_score.PsB}};
+
+
+
+        let interpretation = "";
+    
+        // B Score Interpretation
+    if (total_B < 7) {
+        interpretation += `Your B Score is ${total_B}, you are marvelously optimistic.<br>`;
+    } else if (total_B >= 7 && total_B < 10) {
+        interpretation += `Your B Score is ${total_B}, you are moderately optimistic.<br>`;
+    } else if (total_B >= 10 && total_B < 12) {
+        interpretation += `Your B Score is ${total_B}, which is about average.<br>`;
+    } else if (total_B >= 12 && total_B < 15) {
+        interpretation += `Your B Score is ${total_B}, you are moderately pessimistic.<br>`;
+    } else if (total_B >= 15) {
+        interpretation += `Your B Score is ${total_B}, and anything above 14 cries out for change.<br>`;
+    }
+
+    // G Score Interpretation
+    if (total_G >= 19) {
+        interpretation += `Your G Score is ${total_G}, you think about good events very optimistically.<br>`;
+    } else if (total_G >= 17 && total_G < 19) {
+        interpretation += `Your G Score is ${total_G}, your thinking is moderately optimistic.<br>`;
+    } else if (total_G >= 14 && total_G < 17) {
+        interpretation += `Your G Score is ${total_G}, which is about average.<br>`;
+    } else if (total_G >= 11 && total_G < 14) {
+        interpretation += `Your G Score is ${total_G}, you think quite pessimistically.<br>`;
+    } else if (total_G < 11) {
+        interpretation += `Your G Score is ${total_G}, which indicates great pessimism.<br>`;
+    }
+
+    // G-B Score Interpretation
+    if (total_G_B > 8) {
+        interpretation += `Your G-B Score is ${total_G_B}, you are very optimistic across the board.`;
+    } else if (total_G_B >= 6 && total_G_B <= 8) {
+        interpretation += `Your G-B Score is ${total_G_B}, you are moderately optimistic.`;
+    } else if (total_G_B >= 3 && total_G_B < 6) {
+        interpretation += `Your G-B Score is ${total_G_B}, which is average.`;
+    } else if (total_G_B >= 1 && total_G_B < 3) {
+        interpretation += `Your G-B Score is ${total_G_B}, which is moderately pessimistic.`;
+    } else {
+        interpretation += `Your G-B Score is ${total_G_B}, which is very pessimistic.`;
+    }
+    
+        // Inject interpretation into the DOM
+        document.getElementById("interpretationText").innerHTML = interpretation;
+    window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("score-total_hob").innerText = total_HoB;
+    document.getElementById("score-total_B").innerText = total_B;
+    document.getElementById("score-total_G").innerText = total_G;
+    document.getElementById("score-total_G_B").innerText = total_G_B;
+
+    document.getElementById("input-total_hob").value = total_HoB;
+    document.getElementById("input-total_B").value = total_B;
+    document.getElementById("input-total_G").value = total_G;
+    document.getElementById("input-total_G_B").value = total_G_B;
+});
+    </script>
+</div>
+
+
+
+
+{% endblock content %}
+
+

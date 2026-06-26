@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ assessment_result.name }}'s Result
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+  {% if messages %}
+                    {% for message in messages %}
+                        <div id="alert-{{ forloop.counter }}"
+                             tabindex="0"
+                             aria-live="polite"
+                             class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                             role="alert"
+                             aria-label="{{ message }}">
+                            {{ message }}
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    <div class="justify-content-center text-center mb-4 mt-2">
+      <h1>FS Assessment Report </h1>
+    </div>
+
+    <div class="mt-5">
+        <h2 class="text-center">Scoring Key</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered text-center mt-3">
+                <thead>
+                    <tr>
+                        <th>Dismissing</th>
+                        <th>Disapproving</th>
+                        <th>Laissez-Faire</th>
+                        <th>Emotion Coaching</th>
+                    </tr>
+                    <tbody>
+                        <tr>
+                            <td id="dismissing-cell"></td>
+                            <td id="disapproving-cell"></td>
+                            <td id="laissez-faire-cell"></td>
+                            <td id="emotion-coaching-cell"></td>
+                        </tr>
+                        </tbody>
+                </thead>
+            </table>
+
+        </div>
+        
+    </div>
+    <div class="mb-4">
+        <form action="{% url 'download_pdf' %}" method="post" >
+          {% csrf_token %}
+          <input type="hidden" name="type" value="FS">
+          <input type="hidden" name="date" value="{{ assessment_result.date }}">
+          <input type="hidden" name="name" value="{{ assessment_result.name }}">
+          <input type="hidden" id="input-dismissing" name="dismissing_percent">
+          <input type="hidden" id="input-disapproving" name="disapproving_percent">
+          <input type="hidden" id="input-laissez-faire" name="laissez_faire_percent">
+          <input type="hidden" id="input-emotion-coaching" name="emotion_coaching_percent">
+          <button type="submit" class="btn mt-4" style="background-color: #a8a8a8; color: black;" aria="Generate Detail Report">Generate Detail Report</button>
+        </form>
+    </div>
+
+
+
+</div>
+
+<script>
+let dismissing = {{ assessment_result.new_score.DM }};
+let disapproving = {{ assessment_result.new_score.DAP }};
+let laissez_faire = {{ assessment_result.new_score.LF }};
+let emotion_coaching = {{ assessment_result.new_score.EC }};
+let total_question_type = {{ total_question_type|safe }};
+
+let dismissing_percent = 0;
+let disapproving_percent = 0;
+let laissez_faire_percent = 0;
+let emotion_coaching_percent = 0;
+
+total_question_type.forEach(obj => {
+    const category = obj["question__category"];
+    const count = parseInt(obj["count"]);
+
+    if (category === "DM" && count !== 0) {
+        dismissing_percent = +((dismissing / count) ).toFixed(2);
+    } else if (category === "DAP" && count !== 0) {
+        disapproving_percent = +((disapproving / count) ).toFixed(2);
+    } else if (category === "LF" && count !== 0) {
+        laissez_faire_percent = +((laissez_faire / count) ).toFixed(2);
+    } else if (category === "EC" && count !== 0) {
+        emotion_coaching_percent = +((emotion_coaching / count) ).toFixed(2);
+    }
+});
+
+const resultData = {
+    name: "{{ assessment_result.name }}",
+    date: "{{ assessment_result.date }}",
+    dismissing_percent,
+    disapproving_percent,
+    laissez_faire_percent,
+    emotion_coaching_percent
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("dismissing-cell").innerText = resultData.dismissing_percent ;
+    document.getElementById("disapproving-cell").innerText = resultData.disapproving_percent ;
+    document.getElementById("laissez-faire-cell").innerText = resultData.laissez_faire_percent ;
+    document.getElementById("emotion-coaching-cell").innerText = resultData.emotion_coaching_percent ;
+
+    document.getElementById("input-dismissing").value = resultData.dismissing_percent;
+    document.getElementById("input-disapproving").value = resultData.disapproving_percent;
+    document.getElementById("input-laissez-faire").value = resultData.laissez_faire_percent;
+    document.getElementById("input-emotion-coaching").value = resultData.emotion_coaching_percent;
+});
+</script>
+
+
+
+{% endblock content %}
+
+

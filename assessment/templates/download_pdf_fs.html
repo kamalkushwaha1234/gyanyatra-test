@@ -1,0 +1,249 @@
+{% extends "base-not-nav.html" %}
+{% block title %}
+ {{name}}'s Assessment Report
+  
+{% endblock title %}
+
+{% block content %}
+{% load static %}
+
+<div id="responsive-container" >
+    <h1 class="fs-4">MANOMAYA FEELINGS STYLE  ASSESSMENT REPORT</h1>
+    <p><strong>Name:</strong> {{name}}</p>
+    <p><strong>Date:</strong> {{date}}</p>
+
+    <div >
+        <h5 class="fs-5">Score :</h5>
+        <ul class="fs-6" id="score">
+        </ul>
+        <div id="after_score">
+
+        </div>
+    </div>
+
+    <div id="dismissing">
+
+    </div>
+    <div id="disapproving">
+
+    </div>
+    <div id="laissez_faire">
+
+    </div>
+    <div id="emotion_coaching">
+
+    </div>
+
+    <div id="image">
+        <img src="{% static 'feeling_style.png' %}" alt="Image from static folder" aria-label="Graph showing feeling style results" >
+
+    </div>
+
+    <div id="score_key_inter">
+
+    </div>
+    <div>
+        <p>Kindly repeat the test after 6 months.</p>
+        <p>Warm regards,</p>
+        <p>Dr. Sudha Srikanth</p>
+        <p>Team Manomaya</p>
+    </div>
+  
+</div>
+<style>
+  #responsive-container {
+    padding: 0 1rem; 
+    margin-top: 2rem;
+  }
+  
+  @media (min-width: 992px) { 
+    #responsive-container {
+      margin-left: 100px;
+      margin-right: 200px;
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-top: 3rem;
+
+    }
+  }
+</style>
+<script>
+    const mask = {
+        dismissing:{{dismissing}},
+        disapproving:{{disapproving}},
+        laissez_faire:{{laissez_faire}},
+        emotion_coaching:{{emotion_coaching}},
+    }
+    //get label name
+    function get_name (name){
+        if (name == "dismissing"){
+            return "Dismissing Style"
+        }else if (name == "disapproving"){
+            return "Disapproving Style"
+        }else if (name == "laissez_faire"){
+            return "Laissez-Faire Style"
+        }else if (name == "emotion_coaching"){
+            return "Emotion Coaching Style"
+        }
+    }
+
+    function get_score_label (name,score){
+        if (score < 0.26){
+            if(name === "dismissing"){
+                return "Low : You are likely attentive to emotions and open to discussing feelings."
+            }else if (name === "disapproving"){
+                return "Low : You likely accept emotional expression and don’t judge others harshly."
+            }else if (name === "laissez_faire"){
+                return "Low : You set limits and likely help others understand emotions, not just allow free expression."
+            }else if (name === "emotion_coaching"){
+                return "Low : You may struggle to engage with or validate emotions in a helpful way."
+            }
+        }
+        if (score > 0.25 && score < 0.51){
+            if(name === "dismissing"){
+                return "Moderate : You may sometimes acknowledge emotions, but often prefer to move past them quickly."
+            }else if (name === "disapproving"){
+                return "Moderate : You might occasionally view strong emotions as negative or inappropriate."
+            }else if (name === "laissez_faire"){
+                return "Moderate : You’re supportive but may not guide emotional development actively."
+            }else if (name === "emotion_coaching"){
+                return "Moderate : You show some awareness and support of emotions, with room to grow in coaching and empathy."
+            }
+        }
+        if (score >0.50){
+            if(name === "dismissing"){
+                return "High : You may minimize or ignore emotions, believing they are unimportant or disruptive."
+            }else if (name === "disapproving"){
+                return "High : You likely criticize or suppress emotional expression and see emotions as signs of weakness or misbehaviour."
+            }else if (name === "laissez_faire"){
+                return "High : You may be permissive and accepting but provide little structure or emotional guidance."
+            }else if (name === "emotion_coaching"){
+                return "High : You recognize, validate, and help others understand and work through their emotions—this is considered the ideal emotional style, especially in supportive or caregiving roles."
+            }
+        }  
+    }
+
+
+    function get_definition(name){
+        if (name === "dismissing"){
+            return `<li>Low Warmth, Low Control.</li>
+                    <li>Emotions are seen as unimportant or trivial.</li>
+                    <li>Responses may include minimizing feelings, distracting, or ignoring emotional expressions. </li>`
+        }else if (name === "disapproving"){
+            return  `<li>Low Warmth, High Control.</li>
+            <li>Emotions are judged as bad or inappropriate and are often punished or criticized. </li>
+            <li>Emphasis is placed on discipline over emotional expression. </li>`
+        }else if (name === "laissez_faire"){
+            return  `<li>High Warmth, Low Control. </li>
+            <li>Emotions are freely accepted, but there is little guidance on how to manage or solve them. </li>
+            <li>Emotional support is given without structure.</li>`
+        }else if (name === "emotion_coaching"){
+            return  `<li>High Warmth, High Control. </li>
+            <li>Emotions are recognized, validated, and used as teaching moments. </li>
+            <li>There is guidance on how to deal with emotions constructively. </li>`
+        }
+    }
+
+    function get_professional_impact(name){
+        if (name === "dismissing"){
+            return `<li>Professionals with a dismissing style may seem detached or unapproachable.</li>
+                    <li>They may overlook team members’ emotional needs, causing disengagement.</li>
+                    <li>Conflict resolution is weak because emotions are not adequately addressed. </li>
+                    <li>May lead to low team morale and a culture of emotional suppression. </li>`
+        }else if (name === "disapproving"){
+            return  `<li>Professionals with a disapproving style may create an environment of fear or resentment.</li>
+                    <li>They may prioritize rules and performance over people’s emotional well-being.</li>
+                    <li>Innovation and creativity may suffer as people fear judgment or reprimand.</li>
+                    <li>Could lead to high turnover rates and low psychological safety in teams. </li>`
+        }else if (name === "laissez_faire"){
+            return `<li>Professionals with a laissez-faire style may be seen as kind but ineffective leaders.</li>
+                    <li>While they are approachable and understanding, they may struggle with enforcing boundaries, deadlines, and accountability.</li>
+                    <li>Teams may lack direction, leading to inconsistency and missed goals.</li>
+                    <li>Emotional chaos can build up without clear strategies for resolution. </li>`
+        }else if (name === "emotion_coaching"){
+            return  `<li>Professionals with an emotion coaching style are often highly respected leaders.</li>
+                    <li>They create strong, resilient teams by helping individuals navigate emotional challenges.</li>
+                    <li>High emotional intelligence leads to better collaboration, conflict resolution, and overall team satisfaction. </li>
+                    <li>Encourages innovation, ownership, and loyalty.</li>`
+        }
+    }
+
+    function get_score_list(name){
+        if (name === "dismissing"){
+            return `<li>0.00 – 0.25 → Low : You are likely attentive to emotions and open to discussing feelings.</li>
+                    <li>0.26 –0.50 → Moderate : You may sometimes acknowledge emotions, but often prefer to move past them quickly.</li>
+                    <li>0.51 – 1.00 → High : You may minimize or ignore emotions, believing they are unimportant or disruptive.</li>`
+        }else if (name === "disapproving"){
+            return  `<li>0.00 – 0.25 → Low : You likely accept emotional expression and don’t judge others harshly.</li>
+                    <li>0.26 –0.50 → Moderate : You might occasionally view strong emotions as negative or inappropriate.</li>
+                    <li>0.51 – 1.00 → High : You likely criticize or suppress emotional expression and see emotions as signs of weakness or misbehaviour.</li>`
+        }else if (name === "laissez_faire"){
+            return `<li>0.00 – 0.25 → Low : You set limits and likely help others understand emotions, not just allow free expression.</li>
+                    <li>0.26 –0.50 → Moderate : You’re supportive but may not guide emotional development actively.</li>
+                    <li>0.51 – 1.00 → High : You may be permissive and accepting but provide little structure or emotional guidance.</li>`
+        }else if (name === "emotion_coaching"){
+            return  `<li>0.00 – 0.25 → Low : You may struggle to engage with or validate emotions in a helpful way."</li>
+                    <li>0.26 –0.50 → Moderate : You show some awareness and support of emotions, with room to grow in coaching and empathy.</li>
+                    <li>0.51 – 1.00 → High : You recognize, validate, and help others understand and work through their emotions—this is considered the ideal emotional style, especially in supportive or caregiving roles.</li>`
+        }
+    }
+
+    const div = document.getElementById("score");
+    for (const key in mask){
+        const score = mask[key];
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${get_name(key)}</strong>: ${score} ${get_score_label(key,score)} `;
+        div.appendChild(li);
+
+    }
+
+    for (const key in mask){
+        const div = document.getElementById(key);
+        const head = document.createElement("h2");
+        head.classList.add("fs-5", "mt-5");
+        const name = get_name(key);
+        head.innerHTML = `${name}`;
+        div.appendChild(head);
+
+        const paragraph8 = document.createElement("p");
+        paragraph8.classList.add("mt-4");
+        paragraph8.innerHTML = `<strong>Definition:</strong>`;
+        div.appendChild(paragraph8);
+        const unorderlist1 = document.createElement("ul");
+        unorderlist1.innerHTML=get_definition(key)
+        div.appendChild(unorderlist1);
+
+        const paragraph9 = document.createElement("p");
+        paragraph9.classList.add("mt-4");
+        paragraph9.innerHTML = `<strong>Professional Impact:</strong>`;
+        div.appendChild(paragraph9);
+        const unorderlist = document.createElement("ul");
+        unorderlist.innerHTML=get_professional_impact(key)
+        div.appendChild(unorderlist);
+
+    }
+
+    const div1 = document.getElementById("score_key_inter");
+    const head = document.createElement("h2");
+    head.classList.add("fs-5", "mt-5");
+    head.innerHTML = `Score Interpretation Key `;
+    div1.appendChild(head);
+
+    for (const key in mask){
+        const div = document.getElementById("score_key_inter");
+        const head = document.createElement("h2");
+        head.classList.add("fs-5", "mt-5");
+        const name = get_name(key);
+        head.innerHTML = `${name} `;
+        div.appendChild(head);
+
+        const unorderlist1 = document.createElement("ul");
+        unorderlist1.innerHTML=get_score_list(key)
+        div.appendChild(unorderlist1);
+
+    }
+
+
+
+</script>
+{% endblock content %}

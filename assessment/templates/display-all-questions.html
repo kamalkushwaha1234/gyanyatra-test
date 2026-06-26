@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/display-all-questions.min.js' %}"></script>
+    <section class="d-flex justify-content-center">
+        <div class="col-md-8 mx-2 m-5">
+            <a href="{% url "add_content" %}" class="btn btn-outline-primary">Add New Content</a>
+            <div class="mt-3 d-flex flex-wrap gap-3">
+                <div>
+                    <label for="levelFilter" class="form-label">Filter by level</label>
+                    <select id="levelFilter" class="form-select" style="max-width: 320px;">
+                        <option value="">All levels</option>
+                        {% for level in levels %}
+                            <option value="{{ level.0 }}">{{ level.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="subjectFilter" class="form-label">Filter by subject</label>
+                    <select id="subjectFilter" class="form-select" style="max-width: 320px;">
+                        <option value="">All subjects</option>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.value }}">{{ subject.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            {% if not content_questions_list %}<h3>No content added yet.</h3>{% endif %}
+            <h3 id="noQuestionsMessage" class="mt-3" style="display:none;">No question found.</h3>
+            <div>
+                {% for content_data in content_questions_list %}
+                    <div class="content-block">
+                        <div class="bg-dark-subtle p-2 rounded-3 shadow my-4 d-flex justify-content-between align-items-start gap-3"
+                             aria-label="content for questions">
+                            <div style="max-height:200px;" class="overflow-auto">
+                                {{ content_data.content.content|striptags|truncatewords:10 }}
+                            </div>
+                            {% if content_data.questions %}
+                                <div class="text-end small text-muted flex-shrink-0">
+                                    <div>
+                                        <strong>Level:</strong>
+                                        {{ content_data.questions.0.get_level_display }}
+                                    </div>
+                                    <div>
+                                        <strong>Subject:</strong>
+                                        {{ content_data.questions.0.get_subject_display }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <ol class="overflow-auto">
+                        {% for question in content_data.questions %}
+                            <li style="max-height:100px;"
+                                data-level="{{ question.level }}"
+                                data-subject="{{ question.subject }}">
+                                <a href="{% url 'edit_content' content_data.content.id %}"
+                                   aria-label="question {{ forloop.counter }}">
+                                    {% if question.answer %}
+                                        {{ question.answer|striptags|safe }}
+                                    {% elif question.question %}
+                                        {{ question.question|safe }}
+                                    {% else %}
+                                        {{ question.sentence|safe }}
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        </ol>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock content %}

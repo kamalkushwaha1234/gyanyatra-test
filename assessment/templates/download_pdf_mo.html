@@ -1,0 +1,547 @@
+{% extends "base-not-nav.html" %}
+{% block title %}
+ {{name}}'s Assessment Report
+  
+{% endblock title %}
+
+{% block content %}
+
+<div id="responsive-container" >
+    <h1 class="fs-4">MANOMAYA MEASURING OPTIMISM ASSESSMENT REPORT</h1>
+    <p><strong>Name:</strong> {{name}}</p>
+    <p><strong>Date:</strong> {{date}}</p>
+
+    <p><strong>Optimism Development Action Plan </strong>customized for persons with disabilities and disability 
+        professionals. It includes inclusive strategies that focus on empowerment, accessibility, and practical 
+        reflection—while respecting diverse challenges and strengths</p>
+    <p>Seven categories are measured on the Optimism Questionnaire and one overall combined score reflects your level of optimism. Score each category separately first and then determine the final composite score.</p>
+    <p><strong>Permanent Bad (PmB): </strong>Believing the causes of bad events are permanent. If you totalled 0 or 1, you are very optimistic on this dimension. 2 or 3 is a moderately optimistic score; 4 is average; 5 or 6 is quite pessimistic; and 7 or 8 is very pessimistic.</p>
+    <p><strong>Permanent Good (PmG): </strong>Believing the causes of good events are permanent. If you totalled 7 or 8, you are very optimistic. 6 is a moderately optimistic score; 4 or 5 is average; 3 is a moderately pessimistic score; and 0, 1, or 2 is very pessimistic.</p>
+    <p><strong>Pervasiveness Bad (PvB):  </strong>Believing failures are universal and extend beyond the situation. If you totalled 0 or 1, you are very optimistic on this dimension. 2 or 3 is a moderately optimistic score; 4 is average; 5 or 6 is quite pessimistic; and 7 or 8 is very pessimistic.</p>
+    <p><strong>Pervasiveness Good (PvG): </strong>Believing good events are universal and extend beyond the situation. If you totalled 7 or 8, you are very optimistic. 6 is a moderately optimistic score; 4 or 5 is average; 3 is a moderately pessimistic score; and 0, 1, or 2 is very pessimistic.</p>
+    <p><strong>Hope Score (HoB): </strong>A combination of pervasive and permanent beliefs about bad events. Take your PvB total and add it to your PmB total. This will yield your hope score for bad events. If it is a 0, 1, or 2, you are extraordinarily hopeful. 3, 4, 5, or 6 is a moderately hopeful score; 7 or 8 is average; 9, 10, or 11 is moderately hopeless; and 12, 13, 14, 15, or 16 is severely hopeless.</p>
+    <p><strong>Personalization Bad (PsB):  </strong>Believing faults are personal and internal and, therefore, difficult to change. If you totalled 0 or 1, you have very high self-esteem. 2 or 3 is a moderate self-esteem; 4 is average; 5 or 6 indicates low self-esteem; and 7 or 8 indicates very low self-esteem.</p>
+    <p><strong>Personalization Good (PsG): </strong> Believing faults are external and not personal. If you totalled 7 or 8, you are very optimistic. 6 is a moderately optimistic score; 4 or 5 is average; 3 is a moderately pessimistic score; and 0, 1, or 2 is very pessimistic.</p>
+    <p><strong>Interpreting the Overall Totals: </strong></p>
+    <p>If your B score is from 3 to 6, you are marvellously optimistic. If it is in the 6 to 9 range, you are moderately optimistic; 10 or 11 is about average; 12 to 14 is moderately pessimistic; and anything above 14 cries out for change. </p>
+    <p>If your G score is 19 or above, you think about good events very optimistically. If it is from 17 to 19, your thinking is moderately optimistic; 14 to 16 is about average; 11 to 13 indicates that you think quite pessimistically; and a score of 10 or less indicates great pessimism. <br>Finally, if your G-B score is above 8, you are very optimistic across the board. If it is from 6 to 8, you are moderately optimistic; 3 to 5 is average; 1 or 2 is a moderately pessimistic score; and 0 or below is very pessimistic. </p>
+        <div >
+            <h5 class="fs-5">Score :</h5>
+            <ul class="fs-6" id="score">
+            </ul>
+            <div id="after_score">
+
+            </div>
+        </div>
+
+    <div id="action_plan">
+
+    </div>
+    <div id="cal_pmb">
+
+    </div>
+    <div id="cal_pvb">
+
+    </div>
+    <div id="cal_pvg">
+
+    </div>
+    <div id="cal_psb">
+
+    </div>
+    <div id="cal_psg">
+
+    </div>
+    <div id="cal_pmg">
+
+    </div>
+    <div id="cal_hob" class="mb-5">
+
+    </div>
+    <div id="disabiliity_plan">
+    </div>
+    <div>
+        <p>Kindly repeat the test after 6 months.</p>
+        <p>Warm regards,</p>
+        <p>Dr. Sudha Srikanth</p>
+        <p>Team Manomaya</p>
+    </div>
+  
+</div>
+<style>
+  #responsive-container {
+    padding: 0 1rem; 
+    margin-top: 2rem;
+  }
+  
+  @media (min-width: 992px) { 
+    #responsive-container {
+      margin-left: 100px;
+      margin-right: 200px;
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-top: 3rem;
+
+    }
+  }
+</style>
+  <script>
+    
+    const mask ={
+        cal_pmb: {{cal_pmb}},
+        cal_pmg: {{cal_pmg}},
+        cal_pvb: {{cal_pvb}},
+        cal_pvg: {{cal_pvg}},
+        cal_psb: {{cal_psb}},
+        cal_psg: {{cal_psg}},
+        cal_hob: {{cal_hob}},
+        total_B: {{total_B}},
+        total_G: {{total_G}},
+        total_G_B: {{total_G_B}}
+
+    }
+    const disabiliity = "{{disabiliity}}"
+
+    //for label name
+    //cal_pmb: Permanent Bad (PmB)
+    function get_name (name){
+        if (name == "cal_pmb"){
+            return "Permanent Bad (PmB)"
+        }else if (name == "cal_pvb"){
+            return "Pervasiveness Bad (PvB)"
+        }else if (name == "cal_psb"){
+            return "Personalization Bad (PsB)"
+        }else if (name == "cal_hob"){
+            return "Hope Score"
+        }else if (name == "cal_pmg"){
+            return "Permanent Good (PmG)"
+        }else if (name == "cal_pvg"){
+            return "Pervasiveness Good (PvG)"
+        }else if (name == "cal_psg"){
+            return "Personalization Good (PsG)"
+        }
+    }
+
+    // for goal for each category
+    function get_goal(name){
+        if (name == "cal_pmb"){
+            return "Reduce belief that bad events will last forever."
+        }else if (name == "cal_pvb"){
+            return "Understand that one bad event doesn’t mean everything is bad."
+        }else if (name == "cal_psb"){
+            return "Stop internalizing every failure as a personal flaw."
+        }else if (name == "cal_hob"){
+            return "Strengthen your sense of control and expectation of improvement."
+        }else if (name == "cal_pmg"){
+            return "Strengthen the belief that good events are permanent and repeatable."
+        }else if (name == "cal_pvg"){
+            return "Spread the feeling of success to other areas of life."
+        }else if (name == "cal_psg"){
+            return "Internalize credit for good things."
+        }
+    }
+
+    // for action plan for each category
+    function get_action(name){
+        if (name == "cal_pmb"){
+            return `<li>Dispute Negative Thoughts: When a setback occurs, challenge it with questions: Is this always true? Could this be temporary? </li>
+                    <li>Reframe Setbacks: Use language like “This is a tough week” instead of “Nothing ever goes right for me.” </li>
+                    <li>Success Journal: Write down 1 success or improvement from each day. It shows progress and builds a sense of change. </li>
+                    <li> Adaptive Reframing: Rephrase “This always happens to me” to “This happened today, but I’m learning new ways to manage it.”</li>
+                    <li>Success Memory Journal: Write or record (via audio or assistive tech) moments where a challenge was overcome.</li>
+                    <li>  Encourage individuals to narrate how past setbacks were temporary</li>
+            <li> Peer Sharing: Share small wins in group settings to build self-recognition</li>`
+        }else if (name == "cal_pvb"){
+            return  `<li>Fact-Checking Practice: Ask, Does this affect all areas of my life or just this one? </li>
+            <li>Draw Boundaries: Use mental language like “This happened at work, not at home.” </li>
+            <li>Gratitude Practice: Write 3 things that are going well in other areas of life when something goes wrong. </li>
+            <li>  Area Check: After a setback in one area (like mobility), list 2 areas where things are going okay (like friendships, hobbies).</li>
+            <li>   Personal Map: Visually map parts of life that are working well, alongside those that are challenging.</li>
+            <li>   Remind candidates not to generalize a bad day into a bad life</li>
+            <li> Share specific feedback: “Today’s challenge was only in the training session—not in your overall learning.”</li>`
+        }else if (name == "cal_psb"){
+            return `<li>Alternate Explanations: When you make a mistake, write down 3 other factors that could have contributed. </li>
+            <li>“Talk to a Friend” Technique: Imagine what you’d say if a friend blamed themselves—apply that kindness to yourself. </li>
+            <li> External Factors List: Identify barriers that are beyond your control (e.g., accessibility issues).</li>
+            <li>  Self-Kindness Mantra: Practice saying, “I did my best given the situation.”</li>
+            <li>   Emphasize structural barriers while encouraging self-efficacy</li>
+            <li>Use “Support Conversations” to help clients separate personal ability from systemic challenges.</li>`
+        }else if (name == "cal_hob"){
+            return `<li>Set Small Goals: Create short, achievable tasks daily to prove to yourself that change is possible. </li>
+            <li><ol>Hope Mapping: Write about a future goal. Include:
+            
+                <li>Your goal</li>
+                <li>steps you can take</li>
+                <li>Possible obstacles</li>
+                <li>How you’ll overcome them</li>
+                </ol></li>
+            <li>Mentor Model: Read about or speak to someone who overcame adversity—let their journey fuel your hope. </li>
+            <li>  Hope Plan: Write or record a short plan with small, doable steps for a goal.</li>
+            <li>  Visualize Success: Picture yourself reaching a goal—describe what it looks, sounds, or feels like.</li>
+            <li>  Encourage “Hope Mapping”: Goal + Steps + Obstacles + Strategies</li>
+            <li>Share hopeful stories of others with disabilities overcoming similar challenges</li>`
+        }else if (name == "cal_pmg"){
+            return  `<li>Celebrate Wins: Acknowledge and write about what you did to make something good happen.</li>
+            <li>“Why I Succeeded” Journal: After a positive event, list reasons why it happened (your effort, skill, planning). </li>
+            <li>Positive Visualization: Visualize the good event repeating or growing in the future. </li>
+            <li>  Ownership Reflection: Reflect on positive moments and ask, What did I do to make that happen?</li>
+            <li> Use Visual Aids: Create a “My Achievements Board” with photos or tactile markers of accomplishments</li>
+            <li>  Reinforce and recognize consistent effort, even in small gains</li>
+            <li> Create feedback systems that emphasize progress over time, not just outcomes.</li>`
+        }else if (name == "cal_pvg"){
+            return  `<li>Link Positives: After a good event, ask, How is this part of a larger pattern of success in my life?</li>
+            <li>Affirming Statements: Use statements like “This is just one example of many great things happening.”</li>
+            <li>Share Positives: Tell a friend about your success—it reinforces your belief in it.</li>
+            <li>  Link Positive Areas: Notice how success in one area (like computer training) can improve confidence in another (like communication)</li>
+            <li> Affirmations: Use statements like “My effort in one area reflects my strength in many.”</li>
+            <li>   Celebrate how skills learned are transferable: “Your teamwork here can help you in your job too.”</li>`
+        }else if (name == "cal_psg"){
+            return `<li>Credit Yourself: After success, list at least one way your effort made it happen.</li>
+            <li>“I Made That Happen” Log: Write about something good and underline the parts you influenced.</li>
+            <li>Daily Affirmations: Use “I am” statements like “I am capable,” “I make good things happen.”.</li>
+            <li>   Credit Yourself: Say or write how your choices and actions helped something good happen.</li>
+            <li> Peer Sharing: Share small wins in group settings to build self-recognition</li>
+            <li>   Help candidates recognize their role in success (“You stayed focused and that led to improvement”).</li>
+            <li> Use reflection questions like “What did you do that helped this happen?”</li>`
+        }
+    }
+    
+    // for action plan for each category for persons with disabilities and disability professionals
+    {% comment %} function get_disability(name){
+        if (name == "cal_pmb"){
+            return `<li> Adaptive Reframing: Rephrase “This always happens to me” to “This happened today, but I’m learning new ways to manage it.”</li>
+            <li>Success Memory Journal: Write or record (via audio or assistive tech) moments where a challenge was overcome.</li>`
+        }else if (name == "cal_pvb"){
+            return `<li>  Area Check: After a setback in one area (like mobility), list 2 areas where things are going okay (like friendships, hobbies).</li>
+            <li>   Personal Map: Visually map parts of life that are working well, alongside those that are challenging.</li>`
+        }else if (name == "cal_psb"){
+            return`<li> External Factors List: Identify barriers that are beyond your control (e.g., accessibility issues).</li>
+            <li>  Self-Kindness Mantra: Practice saying, “I did my best given the situation.”</li>`
+        }else if (name == "cal_hob"){
+            return `<li>  Hope Plan: Write or record a short plan with small, doable steps for a goal.</li>
+            <li>  Visualize Success: Picture yourself reaching a goal—describe what it looks, sounds, or feels like.</li>`
+        }else if (name == "cal_pmg"){
+            return `<li>  Ownership Reflection: Reflect on positive moments and ask, What did I do to make that happen?</li>
+            <li> Use Visual Aids: Create a “My Achievements Board” with photos or tactile markers of accomplishments</li>`
+        }else if (name == "cal_pvg"){
+            return `<li>  Link Positive Areas: Notice how success in one area (like computer training) can improve confidence in another (like communication)</li>
+            <li> Affirmations: Use statements like “My effort in one area reflects my strength in many.”</li>`
+        }else if (name == "cal_psg"){
+            return `<li>   Credit Yourself: Say or write how your choices and actions helped something good happen.</li>
+            <li> Peer Sharing: Share small wins in group settings to build self-recognition</li>`
+        }
+    } {% endcomment %}
+
+    {% comment %} function get_not_disability(name){
+        if (name == "cal_pmb"){
+            return `<li>  Encourage individuals to narrate how past setbacks were temporary</li>
+            <li> Peer Sharing: Share small wins in group settings to build self-recognition</li>`
+        }else if (name == "cal_pvb"){
+            return `<li>   Remind candidates not to generalize a bad day into a bad life</li>
+            <li> Share specific feedback: “Today’s challenge was only in the training session—not in your overall learning.”</li>`
+        }else if (name == "cal_psb"){
+            return `<li>   Emphasize structural barriers while encouraging self-efficacy</li>
+            <li>Use “Support Conversations” to help clients separate personal ability from systemic challenges.</li>`
+        }else if (name == "cal_hob"){
+            return `<li>  Encourage “Hope Mapping”: Goal + Steps + Obstacles + Strategies</li>
+            <li>Share hopeful stories of others with disabilities overcoming similar challenges</li>`
+        }else if (name == "cal_pmg"){
+            return `<li>  Reinforce and recognize consistent effort, even in small gains</li>
+            <li> Create feedback systems that emphasize progress over time, not just outcomes.</li>`
+        }else if (name == "cal_pvg"){
+            return `<li>   Celebrate how skills learned are transferable: “Your teamwork here can help you in your job too.”</li>`
+        }else if (name == "cal_psg"){
+            return `<li>   Help candidates recognize their role in success (“You stayed focused and that led to improvement”).</li>
+            <li> Use reflection questions like “What did you do that helped this happen?”</li>`
+        }
+    } {% endcomment %}
+
+
+   //for label description
+    function get_head(name){
+        if (name == "cal_pmb"){
+            return "Shift from “Always” to “Sometimes”"
+        }else if (name == "cal_pvb"){
+            return "Localize the problem"
+        }else if (name == "cal_psb"){
+            return "Reduce self-blame"
+        }else if (name == "cal_hob"){
+            return "Build hopeful beliefs about the future"
+        }else if (name == "cal_pmg"){
+            return " Increase belief that good events are lasting"
+        }else if (name == "cal_pvg"){
+            return " Generalize good experiences"
+        }else if (name == "cal_psg"){
+            return " Own your strengths"
+        }
+    }
+
+    //get the score label for each category
+    function get_score_label(name, score) {
+        if (name === "cal_pmb") {
+            if (score <= 1) return "Very Optimistic";
+            else if (score <= 3) return "Moderately Optimistic";
+            else if (score === 4) return "Average";
+            else if (score <= 6) return "Quite Pessimistic";
+            else return "Very Pessimistic";
+        } else if (name === "cal_pmg") {
+            if (score >= 7) return "Very Optimistic";
+            else if (score === 6) return "Moderately Optimistic";
+            else if (score >= 4) return "Average";
+            else if (score === 3) return "Moderately Pessimistic";
+            else return "Very Pessimistic";
+        } else if (name === "cal_pvb") {
+            if (score <= 1) return "Very Optimistic";
+            else if (score <= 3) return "Moderately Optimistic";
+            else if (score === 4) return "Average";
+            else if (score <= 6) return "Quite Pessimistic";
+            else return "Very Pessimistic";
+        } else if (name === "cal_pvg") {
+            if (score >= 7) return "Very Optimistic";
+            else if (score === 6) return "Moderately Optimistic";
+            else if (score >= 4) return "Average";
+            else if (score === 3) return "Moderately Pessimistic";
+            else return "Very Pessimistic";
+        } else if (name === "cal_hob") {
+            if (score <= 2) return "Extraordinarily Hopeful";
+            else if (score <= 6) return "Moderately Hopeful";
+            else if (score <= 8) return "Average";
+            else if (score <= 11) return "Moderately Hopeless";
+            else return "Severely Hopeless";
+        } else if (name === "cal_psb") {
+            if (score <= 1) return "Very High Self-Esteem";
+            else if (score <= 3) return "Moderate Self-Esteem";
+            else if (score === 4) return "Average";
+            else if (score <= 6) return "Low Self-Esteem";
+            else return "Very Low Self-Esteem";
+        } else if (name === "cal_psg") {
+            if (score >= 7) return "Very Optimistic";
+            else if (score === 6) return "Moderately Optimistic";
+            else if (score >= 4) return "Average";
+            else if (score === 3) return "Moderately Pessimistic";
+            else return "Very Pessimistic";
+        } else if (name === "total_B") {
+            if (score <= 2) return " Marvelously Optimistic";
+            else if (score <= 5) return " Moderately Optimistic";
+            else if (score <= 7) return " Average";
+            else if (score <= 9) return " Moderately Pessimistic";
+            else return " Cries Out For Change";
+        } else if (name === "total_G") {
+            if (score >= 19) return " Very Optimistic";
+            else if (score >= 17) return " Moderately Optimistic";
+            else if (score >= 14) return " Average";
+            else if (score >= 11) return " Quite Pessimistic";
+            else return " Very Pessimistic";
+        } else if (name === "total_G_B") {
+            if (score > 8) return "Very Optimistic";
+            else if (score >= 6) return "Moderately Optimistic";
+            else if (score >= 3) return "Average";
+            else if (score >= 1) return "Moderately Pessimistic";
+            else return "Very Pessimistic";
+        }else {
+            return "Unknown";
+        }
+    }
+
+    //for label middle action when the score is less than 9 or greater than 2 of total_G_B
+    // function get_middle_action(name){
+    //     if (name == "cal_pmb"){
+    //         return `“This is a moment, not a life sentence.” `
+    //     }else if (name == "cal_pvb"){
+    //         return `“One situation doesn’t define everything.” `
+    //     }else if (name == "cal_psb"){
+    //         return `“It’s not all your fault.” `
+    //     }else if (name == "cal_hob"){
+    //         return `“There is a way forward.” `
+    //     }else if (name == "cal_pmg"){
+    //         return ` “Good things can last.” `
+    //     }else if (name == "cal_pvg"){
+    //         return `“Goodness spreads too.” `
+    //     }else if (name == "cal_psg"){
+    //         return `“I played a role in my success.”`
+    //     }
+    // }
+
+    //for label second action when the score is less than 9 or greater than 2 of total_G_B
+    function get_head_second(name){
+        if (name == "cal_pmb"){
+            return ` “This won’t last forever.” `
+        }else if (name == "cal_pvb"){
+            return `“One problem isn’t all problems.” `
+        }else if (name == "cal_psb"){
+            return `“I’m not to blame for everything.” `
+        }else if (name == "cal_hob"){
+            return `“The future can be better.”`
+        }else if (name == "cal_pmg"){
+            return `“Good things can stay.” `
+        }else if (name == "cal_pvg"){
+            return `“Let success spread.” `
+        }else if (name == "cal_psg"){
+            return `“I made this happen.”`
+        }
+    }
+
+    //for label second action when the score is less than 9 or greater than 2 of total_G_B
+    function get_second_pagr(name){
+        if (name == "cal_pmb"){
+            return `<li>  Practice: When something goes wrong, say: “This is temporary, and I can recover.”</li>
+            <li> 	Tool: Use a “Temporary Thoughts” worksheet. Write down what happened, then list 2–3 reasons it might improve soon.</li>`
+        }else if (name == "cal_pvb"){
+            return `<li>   Practice: Ask: “Is this affecting just one area of my life?” Most of the time, the answer is yes.</li>
+            <li> Tool: Use a “Life Areas Balance Sheet” to separate different parts of life (health, work, relationships, learning) and note what’s going well.</li>`
+        }else if (name == "cal_psb"){
+            return `<li>   Practice: Ask: “What other factors played a role here?” (e.g., the system, the environment, other people’s actions).</li>
+            <li>Tool: “3 Reasons Chart”: For any setback, write 3 non-personal explanations before blaming yourself.</li>`
+        }else if (name == "cal_hob"){
+            return `<li> Practice: Use the “Yet” strategy. Replace “I can’t do this” with “I can’t do this yet.”</li>
+            <li><ol>Share hopeful stories of others with disabilities overcoming similar challenges
+                <li>Goal: What do I want? </li>
+                <li>Steps: What are 3 things I can do?</li>
+                <li>Obstacle: What could get in the way? </li>
+                <li>Strategy: How will I handle it?</li></ol></li>`
+        }else if (name == "cal_pmg"){
+            return `<li>  Practice: After a success, write or voice-record: “I did this well. This is who I am.”</li>
+            <li> Tool: Create a “Strengths Resume” — a list of your past wins, effort, and what they say about your potential.</li>`
+        }else if (name == "cal_pvg"){
+            return `<li> Practice: Link success in one area to another: “Because I did well in class, I feel more confident socially.”</li>
+            <li> Tool: “Success Spider”: Draw spokes from a central success and write where else that confidence could apply.</li>`
+        }else if (name == "cal_psg"){
+            return `<li>  Practice: Take ownership of your role in success with statements like: “I made a good choice.”</li>
+            <li> Tool: “Credit Yourself Log”: At the end of the week, note 3 times you made something good happen.</li>`
+        }
+    }
+
+    //generate the score 
+    const div = document.getElementById("score");
+    for (const key in mask){
+        if (key=="cal_hob" || key=="total_B" || key=="total_G" || key=="total_G_B"){
+            continue
+        }
+        const score = mask[key];
+        const li = document.createElement("li");
+        li.innerHTML = `${get_name(key)}: ${score} (${get_score_label(key, score)})`;
+        div.appendChild(li);
+
+    }
+
+    const div1 = document.getElementById("after_score");
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = `Hope Score (HoB) = PmB + PvB = ${mask["cal_pmb"]} + ${mask["cal_pvb"]} = ${mask["cal_hob"]} → ${get_score_label("cal_hob", mask["cal_hob"])} `;
+    div1.appendChild(paragraph);
+    const paragraph1 = document.createElement("p");
+    paragraph1.innerHTML = `Total B  = PmB + PvB + PsB  = ${mask["cal_pmb"]} + ${mask["cal_pvb"]} + ${mask["cal_psb"]}  =  ${mask["total_B"]} → ${get_score_label("total_B", mask["total_B"])} `;
+    div1.appendChild(paragraph1);
+    const paragraph2 = document.createElement("p");
+    paragraph2.innerHTML = `Total G Score = PmG + PvG + PsG  = ${mask["cal_pmg"]} + ${mask["cal_pvg"]} + ${mask["cal_psg"]}  =  ${mask["total_G"]} → ${get_score_label("total_G",mask["total_G"])} `;
+    div1.appendChild(paragraph2);
+    const para = document.createElement("p");
+    para.innerHTML = `Overall Optimism (G - B)  = Total G - Total B   = ${mask["total_G"]} - ${mask["total_B"]}    =  ${mask["total_G_B"]} → ${get_score_label("total_G_B",mask["total_G_B"])} `;
+    div1.appendChild(para);
+
+
+    //generate the first label
+    const div2 = document.getElementById("action_plan");
+    const paragraph10 = document.createElement("p");
+    paragraph10.classList.add("mt-5");
+    if (mask["total_G_B"]>8 ){
+        paragraph10.innerHTML = `<strong>Optimism Action Plan for Persons with Disabilities and Disability Professionals </strong>`;
+    }else if (mask["total_G_B"]<9 && mask["total_G_B"]>2){
+        paragraph10.innerHTML = `<strong>Optimism Action Plan for Moderately pessimistic to average score</strong>`;
+    }else if (mask["total_G_B"]<3 && mask["total_G_B"]>0){
+        paragraph10.innerHTML = `<strong>Optimism Action Plan for Persons with Disabilities and Disability Professionals </strong>`;
+    }else{
+        paragraph10.innerHTML = `<strong>Optimism Action Plan for those falling in Pessimism category:</strong>`;
+    }
+    div2.appendChild(paragraph10);
+ 
+
+
+    for (const key in mask){
+        
+        const score = mask[key];
+        const div = document.getElementById(key);
+        if (!div) {
+            console.warn(`No element with ID "${key}" found.`);
+            continue;
+        }  
+
+        if (mask["total_G_B"]>8 || mask["total_G_B"]<3){
+        
+            const head = document.createElement("h2");
+            head.classList.add("fs-5", "mt-5");
+            const name = get_name(key);
+            const head_name = get_head(key);
+            head.innerHTML = `${name} : ${head_name}`;
+            div.appendChild(head);
+            const paragraph5 = document.createElement("p");
+            paragraph5.classList.add("mt-4");
+            paragraph5.innerHTML = `<strong>Goal:</strong> ${get_goal(key)}`;
+            div.appendChild(paragraph5);
+
+
+            //const middle_head = document.createElement("p");
+            //const middle_name=get_middle_action(key); 
+            //middle_head.innerHTML = `<strong>${name} : ${middle_name}</strong>`;
+            //div.appendChild(middle_head);
+
+            const paragraph6 = document.createElement("p");
+            paragraph6.innerHTML = `<strong>Action:</strong>`;
+            div.appendChild(paragraph6);
+
+            const unorderlist = document.createElement("ul");
+            unorderlist.innerHTML=get_action(key)
+            div.appendChild(unorderlist);
+
+           // if (disabiliity !="None"){
+               // const paragraph7 = document.createElement("p");
+               // paragraph7.classList.add("mt-4");
+                //paragraph7.innerHTML = `<strong>For Persons with Disabilities (PwDs):</strong>`;
+                //div.appendChild(paragraph7);
+                //const unorderlist = document.createElement("ul");
+                //unorderlist.innerHTML=get_disability(key)
+                //div.appendChild(unorderlist);
+
+           // }
+            //else{
+                //const paragraph8 = document.createElement("p");
+                //paragraph8.classList.add("mt-4");
+                //paragraph8.innerHTML = `<strong>For Disability Professionals: </strong>`;
+                //div.appendChild(paragraph8);
+                //const unorderlist = document.createElement("ul");
+                //unorderlist.innerHTML=get_not_disability(key)
+                //div.appendChild(unorderlist);
+
+
+            //}
+            // const paragraph7 = document.createElement("p");
+            // paragraph7.classList.add("mt-4");
+            // paragraph7.innerHTML = `<strong>For Persons with Disabilities (PwDs):</strong>`;
+            // div.appendChild(paragraph7);
+            // const unorderlist2 = document.createElement("ul");
+            // unorderlist2.innerHTML=get_disability(key)
+            // div.appendChild(unorderlist2);
+
+            // const paragraph8 = document.createElement("p");
+            // paragraph8.classList.add("mt-4");
+            // paragraph8.innerHTML = `<strong>For Disability Professionals: </strong>`;
+            // div.appendChild(paragraph8);
+            // const unorderlist3 = document.createElement("ul");
+            // unorderlist3.innerHTML=get_not_disability(key)
+            // div.appendChild(unorderlist3);
+        }else{
+            const head = document.createElement("h2");
+            head.classList.add("fs-5", "mt-5");
+            const name = get_name(key);
+            const head_name = get_head_second(key);
+            head.innerHTML = `${name} : ${head_name}`;
+            div.appendChild(head);
+
+            const unorderlist1 = document.createElement("ul");
+            unorderlist1.innerHTML=get_second_pagr(key)
+            div.appendChild(unorderlist1);
+
+    }
+}
+    
+  </script>
+  {% endblock content %}

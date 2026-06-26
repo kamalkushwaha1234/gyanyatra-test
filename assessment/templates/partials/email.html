@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <title>{{ name }}'s Result</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="keywords" content="">
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        article {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h2 {
+            color: #007bff;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+        </style>
+    </head>
+    <body>
+        <article>
+            <div>
+                <h2>Assessment Result</h2>
+                <p>
+                    <strong>Name:</strong> {{ name }}
+                </p>
+                <p>
+                    <strong>Course:</strong> {{ course }}
+                </p>
+                <p>
+                    <strong>Institute's Name:</strong> {{ organization }}
+                </p>
+                <p>
+                    <strong>Grade:</strong> {{ grade }} - <strong>Score:</strong> {{ score }}
+                </p>
+                <p>
+                    <strong>Start Time of Assessment:</strong> {{ start_time }}
+                    <br>
+                    <strong>Email Time of Assessment:</strong> {{ end_time }}
+                </p>
+                {% if course|lower == "english" %}
+                    <p>
+                        <strong>Grade Information:</strong> {{ description }}
+                    </p>
+                {% endif %}
+            </div>
+        </article>
+    </body>
+</html>

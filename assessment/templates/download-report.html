@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}
+    Download Report
+{% endblock title %}
+{% block content %}
+    <article class="container gap-4 my-5">
+        {% if messages %}
+            {% for message in messages %}
+                <div {% if message.tags %} class="alert my-2 {% if message.tags == "error" %} alert-danger {% else %} alert-{{ message.tags }} {% endif %}
+                     alert-dismissible
+                     fade
+                     show
+                     "
+                     {% endif %}
+                     role="alert">
+                    {{ message }}
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <section class="container-fluid d-flex justify-content-center gap-4 my-5">
+            <form method="post"
+                  action="{% url 'download_results_csv' %}"
+                  class="col-9"
+                  onsubmit="return validateForm(this, {{ total_questions.itmes|safe }})">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-outline-primary">Download</button>
+            </form>
+        </section>
+    </article>
+{% endblock content %}

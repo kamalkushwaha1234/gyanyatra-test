@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    {{ assessment.name|truncatechars:15 }}
+{% endblock title %}
+{% block content %}
+<script>
+    window.ASSESSMENT_ID = {{ assessment.id|default:'null' }};
+    window.ASSESSMENT_LEVEL= "{{assessment.level|default:'null'}}"
+    window.START_TIME = "{{ start_time|default:'' }}";
+</script>
+<script src="{% static 'js/take-assessment.min.js' %}"></script>
+    <style>
+        .hidden-text {
+            position: absolute!important;
+            width: 1px!important;
+            height: 1px!important;
+            margin: -1px!important;
+            padding: 0!important;
+            overflow: hidden!important;
+            clip: rect(0, 0, 0, 0)!important;
+            border: 0!important;
+        }
+
+        .question-text {
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 16px;
+        }
+        .question-h4 {
+            font-size: 16px;
+        }
+        .highlight-question {
+            background-color: #ffef96; 
+            transition: background-color 0.5s ease;
+        }
+        
+    </style>
+    <div class="modal "
+         id="alertModal"
+         tabindex="-1"
+         aria-labelledby="alertModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"  role="presentation">
+                    <h1 class="modal-title fs-5" id="alertModalLabel">Alert</h1>
+                </div>
+                <div class="modal-body">
+                    <p id="popupMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="assessmentSlides" class="d-flex justify-content-center"> 
+        <form method="post" action="{% url 'submit_assessment' assessment.id assessment.name %}" class="col-md-8 container-fluid mx-2 m-5">
+            <div class="slide active" id="slide1" >
+                <div class="d-flex justify-content-center mb-4">
+                <div>
+                    <h1 aria-label="Assessment Name {{assessment.name}}">{{assessment.name}}</h1>
+                </div>
+            </div>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label tabindex="1" for="name" class="form-label">Enter Name</label>
+                <input autofocus
+                       required
+                       aria-label="Name"
+                       type="text"
+                       name="name"
+                       id="name"
+                       class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label tabindex="1" for="email" class="form-label">Enter Email</label>
+                <input required
+                       aria-label="Email"
+                       type="email"
+                       name="email"
+                       id="email"
+                       class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label tabindex="1" for="edu" class="form-label">Enter Your Education</label>
+                <select name="edu" id="edu" class="form-select" required>
+                    <option selected value="" disabled>Select Education</option>
+                    <option value="8th">8th</option>
+                    <option value="9th">9th</option>
+                    <option value="10th">10th</option>
+                    <option value="11th">11th</option>
+                    <option value="12th">12th</option>
+                    <option value="Graduate">Graduate</option>
+                    <option value="Post Graduate">Post Graduate</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label tabindex="1" for="organization" class="form-label">Select your Institution's Name</label>
+                <select name="organization" id="organization" class="form-select" required>
+                        <option selected value="" disabled>Select Institution</option>
+                    {% for org in organizations %}
+                        <option value="{{ org.id }}">{{ org.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="disability">Please select your disability status</label>
+                <select required class="form-control" id="disability" name="disability" aria-labelledby="disability-label">
+                  <option value="" disabled selected>Select your option</option>
+                  {% for disability in disabilities %}
+                    <option value="{{ disability.id }}">{{ disability.name }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+            <button type="button" class="btn btn-outline-primary" id="nextSlide" aria-label="Next">Next</button>
+            </div>
+            <div class="slide" style="display:none;" id="slide2">
+            <div id="assessmentInstructions"
+                 class="alert alert-info mb-3"
+                 style="background-color: rgb(252, 201, 181); color: black;"
+                 role="region"
+                 tabindex="0"
+                 aria-labelledby="assessmentInstructionsHeading"
+                 aria-describedby="assessmentInstructionsContent">
+                <h2 id="assessmentInstructionsHeading" class="fs-6 fw-bold mb-2">
+                    Assessment Instructions
+                </h2>
+                <div id="assessmentInstructionsContent">
+                    <p class="mb-2">
+                        Read the questions carefully and answer as requested.
+                    </p>
+                    <ul class="mb-2">
+                        <li>Choose the correct option for Multiple Choice Questions.</li>
+                        <li>Fill in the blank or blanks as required.</li>
+                        <li>Use capital letters only when required, for example at the beginning of a sentence.</li>
+                        <li>Using capital letters inappropriately will lead to losing marks.</li>
+                    </ul>
+                    <p class="mb-0 fw-semibold">
+                        Kindly manage your screen reader settings appropriately to read and write small letters and capital letters.
+                    </p>
+                </div>
+            </div>
+            
+            <div>
+                <button type="button" class="btn btn-outline-primary"
+                    id="saveProgressButtonTop"
+                    role="button" onclick="collectDraftData()" aria-label="Save Your Progress">Save Your Progress</button>
+            </div>
+            <input type="hidden" name="assessment_id" id="assessment_id" value="{{ assessment.id  }}" />
+            <input type="hidden" name="start_time" id="start_time" value="{{ start_time }}" />
+                            <div id="noofquestion" class="mt-4">
+                                <h2 class="fs-5" >
+                                    Total number of questions in this paper : 
+                                    <span></span>
+                                </h2>
+                            </div>
+            {% for content, questions_dict in questions.items %}
+            <div class="mt-4">
+                <h2 class="fs-5">
+                    {% if questions_dict.audio_question  or questions_dict.question or questions_dict.fillup %}
+                        {% with question_len=questions_dict.question|length audio_len=questions_dict.audio_question|length fillup_len=questions_dict.fillup|length %}
+                        Total Number of questions in section {{ forloop.counter }}: {{ question_len|add:audio_len|add:fillup_len }}
+                        {% endwith %}
+                    {% endif %}
+                    
+                </h2>
+            </div>
+                <div tabindex="0"
+                     class="bg-dark-subtle p-2 rounded-3 shadow overflow-auto"
+                     style="max-height: 200px;"
+                     aria-label="Question Content">{{ content|safe }}</div>
+                
+                <div class="card my-4">
+                    <div class="card-body">
+                        {% for type,question_list in questions_dict.items %}
+                            {% if type == "question" %}
+                                {% for question in question_list %}
+                                    <fieldset class="mb-4 d-flex flex-wrap gap-3 mcq-question"
+                                              data-question-id="{{ forloop.counter }}" >
+                                        <legend id="Question{{ forloop.counter }}" tabindex="-1" class="d-flex flex-row gap-2">
+                                            <h4 class=" fs-6 fw-normal  d-flex flex-row ">
+                                                {% if assessment.subject != "LS"%}
+                                                <span class="fs-6 fw-normal "></span>
+                                                &nbsp;
+                                            {% endif %}{{ question.question|striptags }}</h4>
+                                        </legend>
+
+
+                                        <div class="d-flex flex-column">
+                                       {% for option in question.shuffled_options %}
+                                             <div  class="d-flex flex-row gap-2">
+                                            <label class="form-label " for="{{ option.id }}">
+                                                <input type="radio"
+                                                        name="{{ question.id }}"
+                                                        id="{{ option.id }}"
+                                                        value="{{ option.id }}" />   
+                                                <label class="form-label " for="{{ option.id }}">
+                                                    {{ option.option }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                        </div>
+                                    </fieldset>
+                                {% endfor %}
+                            {% elif type == "audio_question" %}
+                                {% for audio in question_list %}
+                                    <div class="mb-4">
+                                        <fieldset class="mb-4 audio-question" data-question-id="{{ forloop.counter }}" data-audio-id="{{ audio.id }}">
+                                            <legend id="Question{{ forloop.counter }}">
+                                                <h4 class=" fs-6 fw-normal pb-2 d-flex  align-items-center  ">
+                                                <span class="fs-6 fw-normal "></span>&nbsp;
+                                                <audio controls src="{{ audio.question.url }}" type="video" class="" preload=none controlslist="nodownload">
+                                                    Your browser does not support audio.
+                                                </audio>
+                                            </h4>
+                                            </legend>
+                                        <label class="form-label" for="aq_{{ audio.id }}">Enter Your Answer</label>
+                                        <textarea class="form-control"
+                                                  name="aq_{{ audio.id }}"
+                                                  id="aq_{{ audio.id }}"
+                                                  rows="3"
+                                                  data-max-words="{{ audio.answer|wordcount }}"></textarea>
+                                        <small
+                                            id="msg_{{ audio.id }}"
+                                            class="form-text text-muted word-msg"
+                                            role="status"
+                                            aria-live="polite"
+                                            aria-atomic="true">
+                                        </small>
+                                    </fieldset>
+                                    </div>
+                                {% endfor %}
+
+                            {% elif type == "fillup" %}
+                               {% for fillup in question_list %}
+                                    <fieldset class="mb-4 d-flex flex-wrap gap-3 fillup-question" data-question-id="{{ forloop.counter }}" data-fillup-id="{{ fillup.id }}">
+                                          <legend id="Question{{ forloop.counter }}" tabindex="-1" class="d-flex flex-row gap-2">
+                                          </legend>
+                                            <h4 class="fs-6 fw-normal ">
+                                                {% if assessment_subject != "LS" %}
+                                                    <span class="fs-6 fw-normal"></span>&nbsp;
+
+                                                {% endif %}
+                                                {% for part in fillup.sentence_parts %}
+                                                    <span class=" align-bottom">{{ part }}</span>
+                                                    {% if not forloop.last %}
+                                                        <input type="text"
+                                                            name="fillup_{{ fillup.id }}_{{ forloop.counter }}"
+                                                            class="form-control d-inline-block border-2 border-dark align-bottom"
+                                                            aria-label="Blank {{ forloop.counter }} in question {{ forloop.parentloop.counter }}"
+                                                            style="width: 100px; height: 30px; "
+                                                            >
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </h4>
+                                    </fieldset>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            <div>
+                <button type="button" class="btn btn-outline-primary mb-3"
+                    id="saveProgressButtonBottom"
+                    role="button" onclick="collectDraftData()" aria-label="Save Your Progress">Save Your Progress</button>
+            </div>
+            <button type="submit"
+                    class="btn btn-outline-primary"
+                    role="button"
+                    aria-label="Submit">Submit</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

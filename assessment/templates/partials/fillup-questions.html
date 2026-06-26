@@ -1,0 +1,86 @@
+<div x-show="field.type === 'fillup'" :data-index="index + 1"
+ x-data="{
+    insertBlank() {
+        const textarea = $refs.questionTextArea;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+        const blankStr = ' _____ ';
+
+        textarea.value = value.slice(0, start) + blankStr + value.slice(end);
+        textarea.dispatchEvent(new Event('input'));
+
+        field.blank.push({ text: '' });
+    },
+    deleteBlank(idx) {
+        if (idx < 1 || idx > field.blank.length) return;
+
+        field.blank.splice(idx - 1, 1);
+
+        const blankStr = ' _____ ';
+        let count = 0;
+        field.sentence = field.sentence.replace(new RegExp(blankStr, 'g'), (match) => {
+            count++;
+            return count === idx ? '' : match;
+        });
+    },
+    handleDisabledClick(message) {
+        alert(message);
+    }
+}">
+    <input type="hidden" name="fillup_id" :value="field.id ? field.id : ''">
+    <label class="form-label" for="question">Enter Question <span x-text="index + 1"></span></label>
+    <template x-if="field.having_assessment == 'True'">
+            <p class="text-danger fw-bold">This question is part of an assessment. You cannot add, remove, or change the question or the blanks.</p>
+    </template>
+    <template x-if="field.having_assessment == 'False'">
+            <p>You can add a maximum of 5 blanks.</p>
+    </template>
+    
+
+    <textarea required
+              placeholder="Enter Fill In The Blank Question"
+              x-model="field.sentence"
+              id="fillup"
+              name="fillup"
+              class="form-control mb-3 fillup-textarea"
+              aria-label="Fill In The Blank"
+              x-ref="questionTextArea"
+              :readonly="field.having_assessment == 'True'"
+             ></textarea>
+
+    <!-- Add/delete blank Buttons -->
+    <div class="d-flex flex-row gap-2 mb-3">
+        <button type="button"
+                class="btn btn-sm btn-outline-secondary"
+                @click="insertBlank()"
+                :disabled="field.having_assessment == 'True'"
+                x-show="field.blank.length < 5">Add Blank </button>
+    </div>
+
+    <div class="col-8">
+        <!-- Options Input Fields -->
+        <template x-for="idx in 5" :key="idx"  >
+    <div class="d-flex gap-2 mb-1">
+        <input
+            type="text"
+            class="form-control"
+            :placeholder="`Blank ${idx}`"
+            :name="`blank${idx}`"
+            :id="`blank${idx}`"
+            :aria-label="`Blank ${idx}`"
+            x-model="(field.blank[idx - 1] || { text: '' }).text"
+            x-show="field.blank.length >= idx"
+            :readonly="field.having_assessment == 'True'"
+        ></input>
+        <button type="button"
+                class="btn btn-sm btn-outline-danger"
+                @click="deleteBlank(idx)"
+                :disabled="field.having_assessment == 'True'"
+                x-show="field.blank.length >= idx">
+            Delete Blank
+        </button>
+    </div>
+</template>
+    </div>
+</div>

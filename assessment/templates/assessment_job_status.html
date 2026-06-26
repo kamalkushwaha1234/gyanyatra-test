@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Assessment Processing Status{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-7">
+            <h2 tabindex="0">Your Assessment Has Been Submitted and Saved</h2>
+
+            {% if error %}
+                
+                <section class="status-card status-card-danger" aria-labelledby="error-title" aria-live="assertive" aria-atomic="true" role="alert" tabindex="0">
+                    <div class="alert " role="alert">
+                        <h2 class="alert-heading fs-4" id="error-title">Processing Failed</h2>
+                        <p class="mb-3"><strong>Error Details:</strong> {{ error }}</p>
+                        
+                        <hr>
+                        
+                        <div class="error-reporting-section mt-4">
+                            <h3 class="fs-6 mb-3">
+                                <i class="bi bi-exclamation-circle"></i> Need Help?
+                            </h3>
+                            <p class="mb-2">
+                                <strong>Please report this error to our support team:</strong>
+                            </p>
+                            <div class="error-contact-info p-3 bg-light border rounded mb-3">
+                                <p class="mb-2">
+                                    <strong>Email:</strong> 
+                                    <a href="mailto:support@prishni.in" class="text-decoration-none">
+                                        support@prishni.in
+                                    </a>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Subject Line:</strong> Assessment Processing Error - Job ID: <code>{{ request.resolver_match.kwargs.job_id }}</code>
+                                </p>
+                            </div>
+                            
+                            <div class="reporting-instructions">
+                                <p class="fw-semibold mb-2">Please include the following in your email:</p>
+                                <ol class="ps-4">
+                                    <li class="mb-2">
+                                        <strong>Screenshot of this error page</strong>
+                                        <br>
+                                        <small class="text-muted">Windows: Press <kbd>Windows Key + Shift + S</kbd> or use Snipping Tool</small>
+                                        <br>
+                                        <small class="text-muted">Mac: Press <kbd>Cmd + Shift + 4</kbd></small>
+                                    </li>
+                                    <li class="mb-2">
+                                        <strong>Job ID:</strong> <code class="user-select-all">{{ request.resolver_match.kwargs.job_id }}</code>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary copy-to-clipboard ms-2" data-text="{{ request.resolver_match.kwargs.job_id }}" aria-label="Copy Job ID">
+                                            <i class="bi bi-clipboard"></i> Copy
+                                        </button>
+                                    </li>
+                                    <li class="mb-2">
+                                        <strong>Timestamp:</strong> <span id="error-timestamp"></span>
+                                    </li>
+                                    <li class="mb-2">
+                                        <strong>Error message shown:</strong>
+                                        <br>
+                                        <code class="d-block p-2 bg-light border rounded user-select-all">{{ error }}</code>
+                                    </li>
+                                    <li class="mb-0">
+                                        <strong>Brief description</strong> of what you were doing when this occurred
+                                    </li>
+                                </ol>
+                            </div>
+                            
+                            <div class="alert  mt-3" style="background-color: rgb(190, 190, 190); color: Black;" role="alert">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Note:</strong> Our support team will review your request and work to resolve the issue as quickly as possible. We will keep you informed with updates via the email address you provided, so please monitor your inbox (and your spam folder, if necessary). Thank you for your patience and understanding.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            {% elif message %}
+                <p class="status-subtitle">This page refreshes every 30 seconds while processing is in progress.</p>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+                            <div>
+                                <h2 class="mb-0 fs-4">Your Assessment Is Being Processed. Please wait.</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Job ID:</dt>
+                            <dd class="col-sm-8">
+                                {{ request.resolver_match.kwargs.job_id }}
+                            </dd>
+                            <dt class="col-sm-4">Current Status:</dt>
+                            <dd class="col-sm-8">
+                                Processing
+                            </dd>
+                            <dt class="col-sm-4">Next auto-refresh in:</dt>
+                            <dd class="col-sm-8">
+                                <span id="countdown-seconds">30</span> seconds
+                            </dd>
+                        </dl>
+                    </div>
+
+                </div>
+                <p class="form-text mt-3 mb-0">
+                    For stability, manual refresh is limited to once every 20 seconds.
+                </p>
+                <div id="refresh-live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+                <h3 class="fs-5 mt-3">Thanks for your patience while we process your assessment.</h3>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+        .error-reporting-section {
+            font-size: 0.95rem;
+        }
+        
+        .error-contact-info a {
+            font-weight: 600;
+            color: #0d6efd;
+        }
+        
+        .error-contact-info code {
+            background-color: #fff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            color: #800000;
+        }
+
+        code {
+            color: #800000;
+        }
+
+        kbd {
+            background-color: #BEBEBE;
+            color: #374151;
+            border: 1px solid #9ca3af;
+            border-radius: 0.25rem;
+            padding: 0.1rem 0.35rem;
+            font-size: 1em;
+        }
+        
+        .reporting-instructions ol li {
+            line-height: 1.6;
+        }
+        
+        .copy-to-clipboard {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-to-clipboard:hover {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+        
+        .copy-to-clipboard.copied {
+            background-color: #198754 !important;
+            color: white !important;
+        }
+        
+        code.user-select-all {
+            user-select: all;
+            -webkit-user-select: all;
+            -moz-user-select: all;
+            -ms-user-select: all;
+        }
+    </style>
+
+    <script>
+        (function () {
+            // Error page timestamp
+            const errorTimestamp = document.getElementById('error-timestamp');
+            if (errorTimestamp) {
+                const now = new Date();
+                errorTimestamp.textContent = now.toLocaleString();
+            }
+
+            // Copy to clipboard functionality
+            const copyButtons = document.querySelectorAll('.copy-to-clipboard');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const textToCopy = this.getAttribute('data-text');
+                    
+                    // Use modern Clipboard API if available
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            const originalText = this.innerHTML;
+                            this.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                            this.classList.add('copied');
+                            
+                            setTimeout(() => {
+                                this.innerHTML = originalText;
+                                this.classList.remove('copied');
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy:', err);
+                        });
+                    } else {
+                        // Fallback for older browsers
+                        const textarea = document.createElement('textarea');
+                        textarea.value = textToCopy;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        
+                        alert('Copied to clipboard!');
+                    }
+                });
+            });
+
+            // Original countdown and refresh logic
+            const countdownElement = document.getElementById("countdown-seconds");
+            const liveRegion = document.getElementById("refresh-live-region");
+            const jobId = "{{ request.resolver_match.kwargs.job_id }}";
+
+            if (!countdownElement) {
+                return;
+            }
+
+            const autoRefreshSeconds = 30;
+            const manualRefreshCooldownMs = 20000;
+            const storageKey = `assessment_status_last_refresh_${jobId}`;
+            let secondsRemaining = autoRefreshSeconds;
+
+            function nowMs() {
+                return Date.now();
+            }
+
+            function getLastRefresh() {
+                return Number(sessionStorage.getItem(storageKey) || 0);
+            }
+
+            function setLastRefresh() {
+                sessionStorage.setItem(storageKey, String(nowMs()));
+            }
+
+            function refreshPage() {
+                setLastRefresh();
+                window.location.reload();
+            }
+
+            const countdownTimer = setInterval(function () {
+                secondsRemaining -= 1;
+                countdownElement.textContent = String(secondsRemaining);
+
+                if (secondsRemaining === 10 || secondsRemaining === 5) {
+                    liveRegion.textContent = `Page will refresh automatically in ${secondsRemaining} seconds.`;
+                }
+
+                if (secondsRemaining <= 0) {
+                    clearInterval(countdownTimer);
+                    liveRegion.textContent = "Refreshing page automatically now.";
+                    refreshPage();
+                }
+            }, 1000);
+
+            const elapsed = nowMs() - getLastRefresh();
+            if (elapsed < manualRefreshCooldownMs) {
+                const secLeft = Math.ceil((manualRefreshCooldownMs - elapsed) / 1000);
+                liveRegion.textContent = `Manual refresh is allowed after ${secLeft} seconds.`;
+            }
+            setLastRefresh();
+            const mainRegion = document.querySelector("main[role='main']");
+            if (mainRegion) {
+                mainRegion.focus();
+            }
+        })();
+    </script>
+{% endblock %}

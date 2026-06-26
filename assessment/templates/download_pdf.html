@@ -1,0 +1,607 @@
+{% extends "base-not-nav.html" %}
+{% block title %}
+ {{name}}'s Assessment Report
+  
+{% endblock title %}
+
+{% block content %}
+
+<div id="responsive-container" >
+  <div class="">
+    <div class="">
+
+    <div>
+  
+      <h1 class="fs-4">MANOMAYA EQ ASSESSMENT REPORT</h1>
+    <p><strong>Name:</strong> {{name}}</p>
+    <p><strong>Date:</strong> {{date}}</p>
+  
+    <h2 class="fs-5">Overview</h2>
+    <div >
+    <p class="mt-4">This report summarizes the results of the Manomaya EQ (Emotional Intelligence) Assessment. It evaluates five key areas critical to emotional intelligence: <br>Self-Awareness, Emotion Management, Intrinsic Motivation, Empathy, and Social Skills. Each area is scored out of 50. Based on the scores, recommendations are provided to help candidates capitalize on strengths, improve areas requiring attention, and prioritize development where needed.</p>
+   </div>
+    <h2 class="fs-5 mt-5">Assessment Summary</h2>
+    <div class="mt-4">
+    <table id="summary-table" >
+        <thead>
+          <tr>
+        <strong>Key AreaScore (out of 50) Interpretation</strong>
+          </tr>
+        </thead>
+        <tbody id="summary-body">
+          <!-- Rows will be injected by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  
+    <h2 class="fs-5 mt-4">Detailed Analysis and Recommendations</h2>
+  
+    <h3 class="fs-5 mt-4">1. Self-Awareness </h3>
+    <p class="mt-5"><strong>Score:</strong> [{{self_awareness}}]</p>
+    <p><strong>Interpretation:</strong></p>
+    <div class="mt-5">
+    <ul>
+      <li><strong>35-50 :</strong> This is a strength area. You are in tune with your emotions and recognize how they impact your actions.</li>
+      <li><strong>18-34 :</strong> Developing further awareness of emotional triggers will enhance self-reflection.</li>
+      <li><strong> 0-17  : </strong> Prioritize practices like journaling and feedback from trusted peers to improve self-awareness.</li>
+    </ul>
+  </div>
+    <p class="mt-5"><strong>Appreciation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if self_awareness > 34 %}
+    <ul>
+      <li>You recognize your emotions and understand their impact on your thoughts and actions.</li>
+      <li>A strong sense of self-awareness helps you identify strengths and areas needing growth, leading to continuous personal development</li>
+      <li>It enables better decision-making by aligning actions with your values.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif self_awareness < 18 %}
+    <ul>
+      <li>You have taken the first step by participating in this emotional intelligence assessment—this itself is a sign of openness and willingness to grow.</li>
+      <li>Recognizing that self-awareness is a challenge is a strength in itself—it shows courage and a desire for personal development.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif self_awareness > 17 and  self_awareness < 35%}
+    <ul>
+      <li>You recognize your emotions and understand their impact on your thoughts and actions. </li>
+      <li>A strong sense of self-awareness helps you identify strengths and areas needing growth, leading to continuous personal development. </li>
+      <li>It enables better decision-making by aligning actions with your values. </li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Scope for Improvement:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if self_awareness > 34 %}
+    <ul>
+      <li><strong>Deepening reflection :</strong>Regular journaling or mindfulness practices can further sharpen self-awareness.</li>
+      <li><strong>Feedback incorporation:</strong>Actively seek constructive feedback from others to uncover blind spots.</li>
+      <li><strong>Emotional triggers:</strong>Work on identifying more subtle emotional triggers to enhance control in challenging situations</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif self_awareness < 18 %}
+    <ul>
+      <li>You may currently find it difficult to identify and articulate your own emotions.</li>
+      <li>There could be instances where your reactions surprise even you, or you realize how you felt only after the situation has passed.</li>
+      <li>You may tend to depend more on external feedback than your inner understanding of self.</li>
+      <li>This can affect decision-making, communication, and your ability to manage relationships effectively.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif self_awareness > 17 and  self_awareness < 35%}
+    <ul>
+      <li> <strong>Deepening reflection:</strong> Regular journaling or mindfulness practices can further sharpen self-awareness. </li>
+      <li><strong>Deepening reflection:</strong>Actively seek constructive feedback from others to uncover blind spots. </li>
+      <li><strong>Emotional triggers:</strong> Work on identifying more subtle emotional triggers to enhance control in challenging situations.</li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Recommendation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if self_awareness > 34 %}
+    <ul>
+      <li>Engage in regular self-reflection exercises. <strong>Try this:</strong> In any situation stop and ask yourself, what am I feeling right now? How is that feeling affecting my thoughts?</li>
+      <li>Practice mindfulness techniques to stay connected with your emotions.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif self_awareness < 18 %}
+    <ol>
+      <li><p>Start a Daily Reflection Practice:</p>
+        <ul>
+          <li>At the end of each day, take 5–10 minutes to write down your thoughts and emotions.</li>
+          <li>Ask yourself: What did I feel today? Why did I feel that way? How did I respond?</li>
+        </ul>
+      </li>
+      <li><p>Use Emotion Word Lists or Mood Trackers:</p>
+          <ul>
+            <li>These tools can help you build a vocabulary for your feelings. The more specific you can be about your emotions, the more awareness you will develop.</li>
+          </ul>
+      </li>
+      <li><p>Practice Mindfulness or Meditation:</p>
+          <ul>
+            <li>Mindfulness helps you stay present and notice emotions as they arise. Even a few minutes daily can improve your emotional awareness over time.</li>
+          </ul>
+      </li>
+      <li><p>Seek Constructive Feedback:</p>
+        <ul>
+          <li>Ask trusted friends, peers, or mentors how they perceive your responses in certain situations. Compare this with how you felt and responded.</li>
+        </ul>
+      </li>
+      <li><p>Set a Self-Awareness Goal:</p>
+        <ul>
+          <li>For example, “I will pause before responding when I feel stressed and take 3 deep breaths.” Simple goals like this build emotional pause and insight.</li>
+        </ul>
+      </li>
+    </ol>
+    {% comment %} 18-34{% endcomment %}
+    {% elif self_awareness > 17 and  self_awareness < 35%}
+    <ul>
+      <li>Engage in regular self-reflection exercises. <strong>Try this:</strong> In any situation stop and ask yourself, what am I feeling right now? How is that feeling affecting my thoughts?  </li>
+      <li>Practice mindfulness techniques to stay connected with your emotions..</li>
+    </ul>
+    {% endif %}
+    <h3 class="fs-5 mt-5">2. Emotion Management </h3>
+    <p class="mt-5"><strong>Score:</strong> [{{managing_emotions}}]</p>
+    <p><strong>Interpretation:</strong></p>
+    <ul>
+      <li><strong>35-50 :</strong> You effectively regulate emotions, even in challenging situations.</li>
+      <li><strong>18-34 :</strong>  Improving impulse control and stress management will be beneficial.</li>
+      <li><strong> 0-17  : </strong> Prioritize learning coping strategies and relaxation techniques.</li>
+    </ul>
+    
+    <p class="mt-5"><strong>Appreciation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if managing_emotions > 34 %}
+    <ul>
+      <li> You effectively regulate emotions, staying calm under stress and maintaining a positive outlook.</li>
+      <li>Emotion management fosters resilience, enabling smoother navigation through setbacks.</li>
+      <li>It contributes to healthy relationships by preventing reactive behavior.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif managing_emotions < 18 %}
+    <ul>
+      <li>You have taken the first step by participating in this emotional intelligence assessment—this itself is a sign of openness and willingness to grow..</li>
+      <li>Recognizing that self-awareness is a challenge is a strength in itself—it shows courage and a desire for personal development.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif managing_emotions > 17 and  managing_emotions < 35%}
+    <ul>
+      <li>You recognize your emotions and understand their impact on your thoughts and actions. </li>
+      <li>A strong sense of self-awareness helps you identify strengths and areas needing growth, leading to continuous personal development. </li>
+      <li>It enables better decision-making by aligning actions with your values. </li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Scope for Improvement:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if managing_emotions > 34 %}
+    <ul>
+      <li><strong>Practice emotional agility:</strong> Learn to quickly shift from negative emotions to more constructive mindsets.</li>
+      <li><strong>Develop healthier coping strategies:</strong> Experiment with deep breathing or relaxation techniques during high-pressure moments.</li>
+      <li><strong>Increase emotional vocabulary:</strong> Accurate labelling of emotions can improve your ability to manage them.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif managing_emotions < 18 %}
+    <ul>
+      <li>You may currently find it difficult to identify and articulate your own emotions.</li>
+      <li>There could be instances where your reactions surprise even you, or you realize how you felt only after the situation has passed.</li>
+      <li>You may tend to depend more on external feedback than your inner understanding of self.</li>
+      <li>This can affect decision-making, communication, and your ability to manage relationships effectively.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif managing_emotions > 17 and  managing_emotions < 35%}
+    <ul>
+      <li><strong>Deepening reflection :</strong>Regular journaling or mindfulness practices can further sharpen self-awareness.</li>
+      <li><strong>Feedback incorporation:</strong>Actively seek constructive feedback from others to uncover blind spots.</li>
+      <li><strong>Emotional triggers:</strong>Work on identifying more subtle emotional triggers to enhance control in challenging situations</li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Recommendation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if managing_emotions > 34 %}
+    <ul>
+      <li>Use deep breathing or visualization techniques during stressful situations.</li>
+      <li>Identify triggers and develop action plans to respond calmly.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif managing_emotions < 18 %}
+    <ol>
+      <li><p>Start a Daily Reflection Practice:</p>
+        <ul>
+          <li>At the end of each day, take 5–10 minutes to write down your thoughts and emotions.</li>
+          <li>Ask yourself: What did I feel today? Why did I feel that way? How did I respond?</li>
+        </ul>
+      </li>
+      <li><p>Use Emotion Word Lists or Mood Trackers:</p>
+          <ul>
+            <li>These tools can help you build a vocabulary for your feelings. The more specific you can be about your emotions, the more awareness you will develop.</li>
+          </ul>
+      </li>
+      <li><p>Practice Mindfulness or Meditation:</p>
+          <ul>
+            <li>Mindfulness helps you stay present and notice emotions as they arise. Even a few minutes daily can improve your emotional awareness over time.</li>
+          </ul>
+      </li>
+      <li><p>Seek Constructive Feedback:</p>
+        <ul>
+          <li>Ask trusted friends, peers, or mentors how they perceive your responses in certain situations. Compare this with how you felt and responded.</li>
+        </ul>
+      </li>
+      <li><p>Set a Self-Awareness Goal:</p>
+        <ul>
+          <li>For example, “I will pause before responding when I feel stressed and take 3 deep breaths.” Simple goals like this build emotional pause and insight.</li>
+        </ul>
+      </li>
+    </ol>
+    {% comment %} 18-34{% endcomment %}
+    {% elif managing_emotions > 17 and  managing_emotions < 35%}
+    <ul>
+      <li>Engage in regular self-reflection exercises. <strong>Try this:</strong> In any situation stop and ask yourself, what am I feeling right now? How is that feeling affecting my thoughts?</li>
+      <li>Practice mindfulness techniques to stay connected with your emotions.</li>
+    </ul>
+    {% endif %}
+  
+    <h3 class="fs-5 mt-5">3. Intrinsic Motivation</h3>
+    <p class="mt-5"><strong>Score:</strong> [{{motivating_oneself}}]</p>
+    <p><strong>Interpretation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    
+    <ul>
+      <li><strong>35-50 :</strong> You are highly driven and can maintain enthusiasm without external rewards.</li>
+      <li><strong>18-34 :</strong>  Enhancing focus on long-term goals and personal values will help sustain motivation.</li>
+      <li><strong> 0-17  : </strong>Focus on understanding what truly inspires you to develop a deeper sense of motivation.</li>
+    </ul>
+    <p class="mt-5"><strong>Appreciation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if motivating_oneself > 34 %}
+    <ul>
+      <li>Your drive comes from within, fuelled by personal growth, purpose, or passion, rather than external rewards.</li>
+      <li>Intrinsic motivation leads to high engagement and perseverance, even when tasks are challenging.</li>
+      <li>It fosters creativity and long-term success through self-discipline.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif motivating_oneself < 18 %}
+    <ul>
+      <li>You’ve shown self-initiative in taking the EQ test — a powerful signal that you care about growth.</li>
+      <li>A low score doesn’t mean a lack of potential, but rather a need to reconnect with your inner drive.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif motivating_oneself > 17 and  motivating_oneself < 35%}
+    <ul>
+      <li>Your drive comes from within, fuelled by personal growth, purpose, or passion, rather than external rewards.</li>
+      <li>Intrinsic motivation leads to high engagement and perseverance, even when tasks are challenging</li>
+      <li>It fosters creativity and long-term success through self-discipline.</li>
+    </ul>
+    {% endif %}
+    <p><strong>Scope for Improvement:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if motivating_oneself > 34 %}
+    <ul>
+      <li> <strong>Goal alignment:</strong> Regularly revisit personal goals to ensure they align with your evolving interests.</li>
+      <li><strong>Celebrate progress:</strong> Acknowledge small achievements to maintain enthusiasm over time.</li>
+      <li><strong>Prevent burnout:</strong> Balance intrinsic drive with self-care practices to sustain motivation.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif motivating_oneself < 18 %}
+    <ul>
+      <li>You may find it difficult to sustain effort unless there is external pressure or reward.</li>
+      <li>There may be a sense of low energy or unclear personal goals.</li>
+      <li>You might struggle to push forward in the face of failure or obstacles.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif motivating_oneself > 17 and  motivating_oneself < 35%}
+    <ul>
+      <li> <strong>Goal alignment:</strong> Regularly revisit personal goals to ensure they align with your evolving interests.</li>
+      <li><strong>Celebrate progress:</strong> Acknowledge small achievements to maintain enthusiasm over time.</li>
+      <li><strong>Prevent burnout:</strong> Balance intrinsic drive with self-care practices to sustain motivation.</li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Recommendation:</strong> </p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if motivating_oneself > 34 %}
+    <p>This competency is your strength. Continue to delve on your instincts, do what you do passionately and work towards accomplishing your dreams.</p>
+    <ul>
+      <li>Set small, meaningful goals that align with your values.</li>
+      <li>Celebrate progress to maintain enthusiasm over time.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif motivating_oneself < 18 %}
+    <ol>
+      <li><p>Clarify Your ‘Why’:</p>
+        <ul>
+          <li>Reflect on what gives you a sense of purpose or joy. Write down moments when you felt proud or fulfilled.</li>
+        </ul>
+      </li>
+      <li><p>Set Meaningful Goals:</p>
+          <ul>
+            <li>Start with small, achievable goals that are tied to your values — not external expectations.</li>
+          </ul>
+      </li>
+      <li><p>Celebrate Small Wins:</p>
+          <ul>
+            <li>Motivation builds with momentum. Acknowledge every step forward, however small.</li>
+          </ul>
+      </li>
+      <li><p>Surround Yourself with Positive Influences:</p>
+        <ul>
+          <li>Being around driven, positive people can boost your own motivation and belief in your abilities.</li>
+        </ul>
+      </li>
+      <li><p>Practice Self-Talk and Visualization:</p>
+        <ul>
+          <li>Encourage yourself with affirmations. Visualize completing a task and the satisfaction that follows.</li>
+        </ul>
+      </li>
+    </ol>
+    {% comment %} 18-34{% endcomment %}
+    {% elif motivating_oneself > 17 and  motivating_oneself < 35%}
+    <p>This competency is your strength. Continue to delve on your instincts, do what you do passionately</p>
+    {% endif %}
+  
+    <h3 class="fs-5 mt-5">4. Empathy</h3>
+    <p class="mt-5"><strong>Score:</strong> [{{empathy}}]</p>
+    <p><strong>Interpretation:</strong> </p>
+    {% comment %} 35-50 {% endcomment %}
+    <ul>
+      <li><strong>35-50 :</strong> You demonstrate a strong ability to understand and share others’ feelings.</li>
+      <li><strong>18-34 :</strong>  Developing deeper listening skills will improve empathy.</li>
+      <li><strong> 0-17  : </strong> Prioritize connecting with others and practicing empathy-building exercises.</li>
+    </ul>
+    <p><strong>Appreciation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if empathy > 34 %}
+    <ul>
+      <li>You listen actively, understand others’ emotions, and respond with compassion.</li>
+      <li>Empathy builds trust, strengthens interpersonal relationships, and promotes inclusivity.</li>
+      <li>It fosters collaboration and reduces misunderstandings in both personal and professional settings.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif empathy < 18 %}
+    <ul>
+      <li>A low score in empathy is not a personal flaw — it may stem from different life experiences or limited exposure to emotional conversations.</li>
+      <li>The fact that you are here assessing this area shows your openness to understanding others better.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif empathy > 17 and  empathy < 35%}
+    <ul>
+      <li>You listen actively, understand others’ emotions, and respond with compassion.</li>
+      <li>Empathy builds trust, strengthens interpersonal relationships, and promotes inclusivity.</li>
+      <li>It fosters collaboration and reduces misunderstandings in both personal and professional settings.</li>
+    </ul>
+    {% endif %}
+
+
+    <p><strong>Scope for Improvement:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if empathy > 34 %}
+    <ul>
+      <li> <strong>Cultivate cognitive empathy:</strong> Try to understand others’ perspectives, even when they differ from yours.</li>
+      <li> <strong>Set boundaries:</strong> Balance empathy with self-care to prevent emotional fatigue.</li>
+      <li> <strong>Practice deep listening: </strong>Focus on understanding the feelings beneath words during conversations.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif empathy < 18 %}
+    <ul>
+      <li>You may struggle to identify or understand what others are feeling.</li>
+      <li>There may be difficulty responding appropriately in emotionally charged or sensitive situations.</li>
+      <li>Relationships may feel distant or transactional.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif empathy > 17 and  empathy < 35%}
+    <ul>
+      <li> <strong>Cultivate cognitive empathy:</strong> Try to understand others’ perspectives, even when they differ from yours.</li>
+      <li> <strong>Set boundaries:</strong> Balance empathy with self-care to prevent emotional fatigue.</li>
+      <li> <strong>Practice deep listening: </strong>Focus on understanding the feelings beneath words during conversations.</li>
+    </ul>
+    {% endif %}
+    <p><strong>Recommendation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if empathy > 34 %}
+    <p>It is important to focus on this competency as it needs attention to develop.</p>
+    <ul>
+      <li>Engage in active listening by giving full attention to others during conversations.</li>
+      <li>Practice putting yourself in others’ shoes to enhance emotional connection.</li>
+    </ul>
+    <p>Try to be non-judgemental and accepting of yourself and others.</p>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif empathy < 18 %}
+    <ol>
+      <li><p>Listen Without Interrupting:</p>
+        <ul>
+          <li>Focus completely on what someone is saying, without preparing your reply while they speak.</li>
+        </ul>
+      </li>
+      <li><p>Ask Reflective Questions:</p>
+          <ul>
+            <li>Use phrases like “How did that make you feel?” or “What do you need from me right now?”</li>
+          </ul>
+      </li>
+      <li><p>Read or Watch Stories About Human Experiences:</p>
+          <ul>
+            <li>Books, documentaries, and real-life stories help develop emotional understanding.</li>
+          </ul>
+      </li>
+      <li><p>Mirror and Acknowledge Emotions:</p>
+        <ul>
+          <li>Practice identifying emotions in others and gently reflecting them back: “You seem upset — do you want to talk about it?”</li>
+        </ul>
+      </li>
+      <li><p>Volunteer or Engage in Helping Roles:</p>
+        <ul>
+          <li>Direct involvement in others’ lives can enhance compassion and understanding</li>
+        </ul>
+      </li>
+    </ol>
+    {% comment %} 18-34{% endcomment %}
+    {% elif empathy > 17 and  empathy < 35%}
+    <p>It is important to focus on this competency as it needs attention to develop.</p>
+    <ul>
+      <li>Engage in active listening by giving full attention to others during conversations.</li>
+      <li>Practice putting yourself in others’ shoes to enhance emotional connection.</li>
+    </ul>
+    <p>Try to be non-judgemental and accepting of yourself and others.</p>
+    {% endif %}
+  
+    <h3 class="fs-5 mt-5">5. Social Skills </h3>
+    <p class="mt-5"><strong>Score:</strong> [{{social_skill}}]</p>
+    <p><strong>Interpretation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    <ul>
+      <li><strong>35-50 :</strong> You effectively communicate and build positive relationships.</li>
+      <li><strong>18-34 :</strong>  Strengthening communication and conflict resolution skills will enhance social interactions.</li>
+      <li><strong> 0-17  : </strong> Prioritize building rapport and practicing assertive communication.</li>
+    </ul>
+    <p class="mt-5"><strong>Appreciation:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if social_skill > 34 %}
+    <ul>
+      <li>You communicate effectively, resolve conflicts gracefully, and collaborate well in teams.</li>
+      <li>Strong social skills enhance leadership and networking abilities.</li>
+      <li>They contribute to creating meaningful connections and fostering teamwork.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif social_skill < 18 %}
+    <ul>
+      <li>You’ve shown the courage to reflect on your social abilities — that in itself is a big step.</li>
+      <li>Even those who are shy, introverted, or hesitant can learn social intelligence with consistent effort.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif social_skill > 17 and  social_skill < 35%}
+    <ul>
+      <li>You communicate effectively, resolve conflicts gracefully, and collaborate well in teams.</li>
+      <li>Strong social skills enhance leadership and networking abilities.</li>
+      <li>They contribute to creating meaningful connections and fostering teamwork.</li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Scope for Improvement:</strong></p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if social_skill > 34 %}
+    <ul>
+      <li><strong>Expand social circle:</strong> Engage with diverse groups to build cultural competence and new connections.</li>
+      <li><strong>Improve non-verbal communication:</strong> Pay attention to body language and tone to align with verbal messages.</li>
+      <li><strong>Manage difficult conversations:</strong> Practice techniques to handle conflict and give constructive feedback effectively.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif social_skill < 18 %}
+    <ul>
+      <li>You might find it hard to initiate conversations, maintain relationships, or express yourself clearly.</li>
+      <li>Conflict resolution or teamwork might feel uncomfortable.</li>
+      <li>There could be difficulty in adapting your communication based on the audience.</li>
+    </ul>
+    {% comment %} 18-34{% endcomment %}
+    {% elif social_skill > 17 and  social_skill < 35%}
+    <ul>
+      <li><strong>Expand social circle:</strong> Engage with diverse groups to build cultural competence and new connections.</li>
+      <li><strong>Improve non-verbal communication:</strong> Pay attention to body language and tone to align with verbal messages.</li>
+      <li><strong>Manage difficult conversations:</strong> Practice techniques to handle conflict and give constructive feedback effectively.</li>
+    </ul>
+    {% endif %}
+    <p class="mt-5"><strong>Recommendation:</strong> </p>
+    {% comment %} 35-50 {% endcomment %}
+    {% if social_skill > 34 %}
+    <p>You’re doing well in this competency. Continue to establish and maintain relations as you network.</p>
+    <ul>
+      <li>Participate in group activities to improve interpersonal skills.</li>
+      <li>Work on constructive feedback delivery and conflict resolution techniques.</li>
+    </ul>
+    {% comment %} 0-17 {% endcomment %}
+    {% elif social_skill < 18 %}
+    <ol>
+      <li><p>Start Small Conversations Daily:</p>
+        <ul>
+          <li>Begin with greetings, compliments, or simple questions to build confidence in social settings.</li>
+        </ul>
+      </li>
+      <li><p>Observe Socially Skilled People:</p>
+          <ul>
+            <li>Watch how they use eye contact, tone, and body language — then try to practice one aspect at a time.</li>
+          </ul>
+      </li>
+      <li><p>Join Group Activities:</p>
+          <ul>
+            <li>Community clubs, team tasks, or interest groups offer safe spaces to develop interactions.</li>
+          </ul>
+      </li>
+      <li><p>Work on Assertive Communication:</p>
+        <ul>
+          <li>Practice expressing opinions respectfully without being aggressive or passive.</li>
+        </ul>
+      </li>
+      <li><p>Reflect After Interactions:</p>
+        <ul>
+          <li>Ask yourself: What went well? What could I do better next time</li>
+        </ul>
+      </li>
+    </ol>
+    {% comment %} 18-34{% endcomment %}
+    {% elif social_skill > 17 and  social_skill < 35%}
+    <p>You’re doing well in this competency. Continue to establish and maintain relations as you network.</p>
+    <ul>
+      <li>Participate in group activities to improve interpersonal skills.</li>
+      <li>Work on constructive feedback delivery and conflict resolution techniques.</li>
+    </ul>
+    {% endif %}
+  
+    <h2 class="fs-5 mt-5">Final Thoughts and Action Plan</h2>
+    <ul>
+      <li>Continue to enhance your self-awareness, emotion management, intrinsic motivation and social skills</li>
+      <li>Focus on improving your empathy skills.</li>
+      <li>Repeat the test after 4-6 months</li>
+    </ul>
+  
+    <p><strong>Warm regards,</strong><br>Dr. Sudha Srikanth<br>Project Manomaya</p>
+  
+    </div>
+  
+
+  </div>
+</div>
+</div>
+<style>
+  #responsive-container {
+    padding: 0 1rem; 
+    margin-top: 2rem;
+  }
+  
+  @media (min-width: 992px) { 
+    #responsive-container {
+      margin-left: 100px;
+      margin-right: 200px;
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-top: 3rem;
+
+    }
+  }
+</style>
+  <script>
+    const mask = {
+        self_awareness: {{self_awareness}},
+        managing_emotions: {{managing_emotions}},
+        motivating_oneself: {{motivating_oneself}},
+        empathy: {{empathy}},
+        social_skill: {{social_skill}},
+      };
+    
+      const interpretation = (score) => {
+        return score > 34
+          ? "Strength"
+            : score > 17
+            ? "	Giving attention to where you feel you are weakest will pay dividends"
+              : "Make this area a development priority";
+      };
+    
+      const keyAreas = {
+        self_awareness: "Self-Awareness",
+        managing_emotions: "Emotion Management",
+        motivating_oneself: "Intrinsic Motivation",
+        empathy: "Empathy",
+        social_skill: "Social Skills",
+      };
+    
+      const tbody = document.getElementById("summary-body");
+    
+      for (const key in mask) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${keyAreas[key]}: [<strong>${mask[key]} </strong>] ${interpretation(mask[key])}</td>
+        `;
+        tbody.appendChild(row);
+      }
+  </script>
+  {% endblock content %}

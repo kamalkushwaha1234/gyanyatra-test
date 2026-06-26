@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ assessment_result.name }}'s Result
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+  {% if messages %}
+                    {% for message in messages %}
+                        <div id="alert-{{ forloop.counter }}"
+                             tabindex="0"
+                             aria-live="polite"
+                             class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                             role="alert"
+                             aria-label="{{ message }}">
+                            {{ message }}
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+    <div class="justify-content-center text-center mb-4 mt-2">
+      <h1>EQ Assessment Report </h1>
+    </div>
+  <div class="table-responsive">
+  <table class="table table-bordered" id="assessment-table" aria-describedby="table-desc" style="min-width: 600px;">
+    <thead>
+      <tr>
+        <th class="w-25"></th>
+        <th scope="col" class="sr-th fs-5">Marks</th>
+        <th scope="col" class="sr-th fs-5">Strength</th>
+        <th scope="col" class="sr-th fs-5">Needs Attention</th>
+        <th scope="col" class="sr-th fs-5">Development Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-category="self_awareness">
+        <th scope="row" class="sr-background fs-5">Self Awareness</th>
+        <td class="text-center align-middle fs-5 " style="background-color: #E6F7FE;">{{ assessment_result.new_score.SA}}</td>
+        <td class="strength text-center align-middle" style="background-color: #E6F7FE;" aria-label="Self Awareness Strength Status"></td>
+        <td class="attention text-center align-middle" style="background-color: #E6F7FE;" aria-label="Self Awareness Attention Status"></td>
+        <td class="priority text-center align-middle" style="background-color: #E6F7FE" aria-label="Self Awareness Priority Status"></td>
+      </tr>
+      <tr data-category="managing_emotions">
+        <th scope="row" class="sr-background fs-5">Managing Emotions</th>
+        <td class="text-center align-middle fs-5"  style="background-color: #E6F7FE;">{{ assessment_result.new_score.ME }}</td>
+        <td class="strength text-center align-middle" style="background-color: #E6F7FE;" aria-label="Managing Emotions Strength Status"></td>
+        <td class="attention text-center align-middle" style="background-color: #E6F7FE;" aria-label="Managing Emotions Attention Status"></td>
+        <td class="priority text-center align-middle" style="background-color: #E6F7FE;" aria-label="Managing Emotions Priority Status"></td>
+      </tr>
+      <tr data-category="motivating_oneself">
+        <th scope="row" class="sr-background fs-5">Motivating Oneself</th>
+        <td class="text-center align-middle fs-5"  style="background-color: #E6F7FE;">{{ assessment_result.new_score.MO }}</td>
+        <td class="strength text-center align-middle" style="background-color: #E6F7FE;" aria-label="Motivating Oneself Strength Status"></td>
+        <td class="attention text-center align-middle" style="background-color: #E6F7FE;" aria-label="Motivating Oneself Attention Status"></td>
+        <td class="priority text-center align-middle" style="background-color: #E6F7FE;" aria-label="Motivating Oneself Priority Status"></td>
+      </tr>
+      <tr data-category="empathy">
+        <th scope="row" class="sr-background fs-5">Empathy</th>
+        <td class="text-center align-middle fs-5"  style="background-color: #E6F7FE;">{{ assessment_result.new_score.EP}}</td>
+        <td class="strength text-center align-middle" style="background-color: #E6F7FE;" aria-label="Empathy Strength Status"></td>
+        <td class="attention text-center align-middle" style="background-color: #E6F7FE;" aria-label="Empathy Attention Status"></td>
+        <td class="priority text-center align-middle" style="background-color: #E6F7FE;" aria-label="Empathy Priority Status"></td>
+      </tr>
+      <tr data-category="social_skill">
+        <th scope="row" class="sr-background fs-5">Social Skill</th>
+        <td class="text-center align-middle fs-5" style="background-color: #E6F7FE;">{{ assessment_result.new_score.SS }}</td>
+        <td class="strength text-center align-middle" style="background-color: #E6F7FE;" aria-label="Social Skill Strength Status"></td>
+        <td class="attention text-center align-middle" style="background-color: #E6F7FE;" aria-label="Social Skill Attention Status"></td>
+        <td class="priority text-center align-middle" style="background-color: #E6F7FE;" aria-label="Social Skill Priority Status"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div class=" mt-4 mb-4">
+  <div class="mb-4"><h3>Interpret your totals for each area of competency using the following guide.</h3></div>
+  <div  class="table-responsive">
+    <table class="table table-bordered" >
+      <tbody>
+        <tr>
+          <th>
+            <div class="fs-5">35-50</div>
+          </th>
+          <td class="fs-5">This area is a strength for you.</td>
+        </tr>
+
+        <tr>
+          <th>
+            <div class="fs-5">18-34</div>
+          </th>
+          <td class="fs-5">Giving attention to where you feel you are weakest will pay dividends.</td>
+        </tr>
+
+        <tr>
+          <th>
+            <div class="fs-5">10-17</div>
+          </th>
+          <td class="fs-5">Make this area a development priority.</td>
+        </tr>
+      </tbody>
+
+
+    </table>
+  </div>
+  
+</div>
+
+<div class="mt-4">
+  <h3>Descriptions of Emotional intelligence questionnaire:</h3>
+
+  <ul>
+    <li ><strong><h4>Self-awareness</h4></strong>
+      <div class="fs-4">
+        The ability to recognise what you are feeling, to understand your habitual emotional responses to events and to recognise how your emotions affect your behaviour and performance.
+        When you are self-aware, you see yourself as others see you, and have a good sense of your own abilities and current limitations.
+      </div>
+
+    </li>
+
+    <li ><strong><h4>Managing emotions</h4></strong>
+      <div class="fs-4">
+        The ability to stay focused and think clearly even when experiencing powerful emotions.
+      Being able to manage your own emotional state is essential for taking responsibility for your actions, and can save you from hasty decisions that you later regret.
+      </div>
+      
+    </li>
+
+    <li ><strong><h4>Motivating oneself</h4></strong>
+      <div class="fs-4">
+        The ability to use your deepest emotions to move and guide you towards your goals. This ability enables you to take the initiative and to persevere in the face of obstacles and setbacks.
+      </div>
+
+    </li>
+
+    <li ><strong><h4>Empathy</h4></strong>
+      <div class="fs-4">
+        The ability to sense, understand and respond to what other people are feeling.
+        Self-awareness is essential to having empathy with others. If you are not aware of your own emotions, you will not be able to read the emotions of others.
+      </div>
+
+    </li>
+
+    <li><strong><h4>Social Skill</h4></strong>
+      <div class="fs-4">
+        The ability to manage, influence and inspire emotions in others.
+        Being able to handle emotions in relationships and being able to influence and inspire others are essential foundation skills for successful teamwork and leadership.
+      </div>
+
+    </li>
+  </ul>
+  <div class="mb-4">
+  <form action="{% url 'download_pdf' %}" method="post" >
+    {% csrf_token %}
+    <input type="hidden" name="type" value="EIQ">
+    <input type="hidden" name="date" value="{{ assessment_result.date }}">
+    <input type="hidden" name="name" value="{{ assessment_result.name }}">
+    <input type="hidden" name="self_awareness" value="{{ assessment_result.new_score.SA }}">
+    <input type="hidden" name="managing_emotions" value="{{ assessment_result.new_score.ME }}">
+    <input type="hidden" name="motivating_oneself" value="{{ assessment_result.new_score.MO }}">
+    <input type="hidden" name="empathy" value="{{ assessment_result.new_score.EP }}">
+    <input type="hidden" name="social_skill" value="{{ assessment_result.new_score.SS }}">
+    <button type="submit" class="btn mt-4" style="background-color: #a8a8a8; color: black;" aria="Generate Detail Report">Generate Detail Report</button>
+  </form>
+</div>
+</div>
+
+
+</div>
+
+<style>
+  th.sr-background {
+    background-color: #00A79D !important;
+    color: #ffffff;
+    
+  }
+  th.sr-th {
+    background-color: #5F2C91 !important;
+    color: #ffffff;
+    
+  }
+  .tick {
+    color: green;
+    font-size: 18px;
+  }
+  @media (max-width: 768px) {
+    th.sr-th {
+      font-size: 12px;
+      padding: 4px;
+      white-space: nowrap;
+    }
+    th.sr-background {
+      font-size: 14px;
+      padding: 6px;
+    }
+    .table td, .table th {
+      padding: 6px;
+    }
+  }
+  ul {
+  padding-left: 1rem;
+}
+ul li {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+</style>
+<script>
+  let self_awareness = {{ assessment_result.new_score.SA }};
+  let managing_emotions = {{ assessment_result.new_score.ME }};
+  let motivating_oneself = {{ assessment_result.new_score.MO }};
+  let empathy = {{ assessment_result.new_score.EP }};
+  let social_skill = {{ assessment_result.new_score.SS }};
+  let self_awareness_percent = 0;
+  let managing_emotions_percent = 0;
+  let motivating_oneself_percent = 0;
+  let empathy_percent = 0;
+  let social_skill_percent = 0;
+  const total_question_type = JSON.parse('{{ total_question_type|safe }}');
+
+  total_question_type.forEach((obj) => {
+    const category = obj["question__category"];
+    const count = parseInt(obj["count"]);
+
+    if (category === "SA") {
+        if (count !== 0 && self_awareness !== 0) {
+            self_awareness_percent = parseInt((self_awareness / (count * 5)) * 100);
+        }
+    } else if (category === "EP") {
+        if (count !== 0 && empathy !== 0) {
+            empathy_percent = parseInt((empathy / (count * 5)) * 100);
+        }
+    } else if (category === "ME") {
+        if (count !== 0 && managing_emotions !== 0) {
+            managing_emotions_percent = parseInt((managing_emotions / (count * 5)) * 100);
+        }
+    } else if (category === "MO") {
+        if (count !== 0 && motivating_oneself !== 0) {
+            motivating_oneself_percent = parseInt((motivating_oneself / (count * 5)) * 100);
+        }
+    } else if (category === "SS") {
+        if (count !== 0 && social_skill !== 0) {
+            social_skill_percent = parseInt((social_skill / (count * 5)) * 100);
+        }
+    }
+});
+    const percentData = {
+        self_awareness: self_awareness_percent,
+        managing_emotions: managing_emotions_percent,
+        motivating_oneself: motivating_oneself_percent,
+        empathy: empathy_percent,
+        social_skill: social_skill_percent
+      };
+
+      const renderAssessment = () => {
+        Object.entries(percentData).forEach(([category, percent]) => {
+          const row = document.querySelector(`tr[data-category="${category}"]`);
+          if (!row) return;
+    
+          if (percent >= 70) {
+            row.querySelector(".strength").innerHTML = `<span class="tick"  aria-label="Yes">&#10004;</span>`;
+          } else if (percent >= 30 && percent < 70) {
+            row.querySelector(".attention").innerHTML = `<span class="tick"  aria-label="Yes">&#10004;</span>`;
+          } else {
+            row.querySelector(".priority").innerHTML = `<span class="tick"  aria-label="Yes">&#10004;</span>`;
+          }
+        });
+      };
+    
+      document.addEventListener("DOMContentLoaded", renderAssessment);
+</script>
+
+{% endblock content %}

@@ -1,0 +1,126 @@
+<div class="question-block" x-show="field.type === 'question'" :data-index="index + 1">
+    <input type="hidden" name="question_id" :value="field.id ? field.id : ''">
+    
+    <label class="form-label" for="question">Enter Question <span x-text="index +1 "></span> </label>
+    <template x-if="field.having_assessment == 'True'">
+            <p class="text-danger fw-bold">This question is part of an assessment. You cannot add, remove, or change the options or the correct answer.</p>
+    </template>
+    <template x-if="field.having_assessment == 'False'">
+             <p>You can add a maximum of 5 options.</p>
+    </template>
+    <textarea required
+              placeholder="Enter Question"
+              x-model="field.question"
+              id="question"
+              name="question"
+              class="form-control mb-3"
+              aria-label="Question"></textarea>
+
+    <div class="col-8">
+        <!-- Options Input Fields -->
+        <template x-for="idx in 5" :key="idx">
+            <input
+                :readonly="field.having_assessment == 'True'"
+                type="text"
+                class="form-control mb-3"
+                :placeholder="`Option ${idx}`"
+                :name="`option${idx}`"
+                :id="`option${idx}`"
+                :aria-label="`Option ${idx}`"
+                x-model="(field.options[idx - 1] || { option: '' }).option"
+                x-show="field.options.length >= idx"
+            >
+        </template>
+
+        <!-- Add/Remove Option Buttons -->
+        <div class="d-flex gap-2 mb-3">
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    @click="field.options.push({ option: '' })"
+                    :disabled="field.having_assessment == 'True'"
+                    x-show="field.options.length < 5"
+                    >Add Option</button>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    @click="field.options.pop()"
+                    x-show="field.options.length > 2"
+                    :disabled="field.having_assessment == 'True'"
+                    >Remove Option</button>
+        </div>
+
+        <!-- Category Selection -->
+        <div>
+            <template x-for="life_cat in lifeskillCategory" :key="life_cat">
+                <template x-if="selectedlevel === life_cat">
+                    <div>
+                        <label for="category" class="form-label">Select Category</label>
+                        <select required
+                                class="form-select mb-3"
+                                name="category"
+                                id="category"
+                                x-model="field.category"
+                                aria-label="Select Category"
+                                @change="field.having_assessment == 'True' ? alert('This question is part of an assessment. You cannot change the category.') : null">
+                            <template x-for="(cat, catindex) in categories" :key="catindex">
+                                <template x-if="cat.level == life_cat">
+                                    <option :value="cat.name" x-text="cat.label" :selected="field.category == cat.name">
+                                    </option>
+                                </template>
+                                
+                            </template>
+                        </select>
+                    </div>
+                </template>
+            </template>
+        </div>
+
+        <!-- Correct Answer Dropdown -->
+
+        <template x-for="life_cor in lifeskillCorrect" :key="life_cor">
+            <template x-if="selectedlevel === life_cor">
+                <div>
+                    <label for="correct" class="form-label">Choose Correct Answer</label>
+                    <!-- Hidden input sent only when assessment is locked -->
+                    <template x-if="field.having_assessment == 'True'">
+                        <div>
+                            <template 
+                                x-for="(option, optionIndex) in field.options" 
+                                :key="optionIndex"
+                            >
+                                <template x-if="(option.id && String(option.id) === String(field.correct)) || String(optionIndex + 1) === String(field.correct)">
+                                    <input 
+                                        type="hidden" 
+                                        name="correct" 
+                                        :value="optionIndex + 1"
+                                    >
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+                    <select required
+                            class="form-select mb-3"
+                            name="correct"
+                            id="correct"
+                            aria-label="Correct Answer"
+                            :disabled="field.having_assessment == 'True'"
+                    >
+        
+                        <!-- Show dynamic options if available -->
+                        <template x-for="(option, optionIndex) in field.options" :key="optionIndex" >
+                            <option :value="`${optionIndex + 1}`"
+                                    x-text="`Option ${optionIndex + 1}`"
+                                    x-bind:selected="(option.id && String(option.id) === String(field.correct)) || String(optionIndex + 1) === String(field.correct)"></option>
+                        </template>
+                        <template x-if="field.options.length === 0">
+                            <template x-for="defaultOption in [1, 2, 3, 4]" :key="defaultOption">
+                                <option :value="defaultOption" x-text="'Option ' + defaultOption"></option>
+                            </template>
+                        </template>
+        
+                    </select>
+                </div>
+            </template>
+        </template>    
+    </div>
+</div>
