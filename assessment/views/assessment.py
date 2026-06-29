@@ -34,7 +34,12 @@ import json
 from django.db import transaction
 from assessment.services.curd_question import _parse_sublevel_distribution, _safe_int, _select_for_type, _select_random_by_content
 from assessment.services.user_context_service import get_client_ip
-from azure.storage.queue import QueueClient
+try:
+    from azure.storage.queue import QueueClient
+    AZURE_QUEUE_AVAILABLE = True
+except Exception:
+    QueueClient = None
+    AZURE_QUEUE_AVAILABLE = False
 import uuid
 from assessment.services.queue_service import QueueService
 
