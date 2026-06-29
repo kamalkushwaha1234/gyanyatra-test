@@ -28,18 +28,12 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib import messages
 from assessmentPrishni import settings
-from assessmentPrishni.settings import SEND_EMAIL, AZURE_QUEUE_CONNECTION
+from assessmentPrishni.settings import SEND_EMAIL
 from django.core.cache import cache
 import json
 from django.db import transaction
 from assessment.services.curd_question import _parse_sublevel_distribution, _safe_int, _select_for_type, _select_random_by_content
 from assessment.services.user_context_service import get_client_ip
-try:
-    from azure.storage.queue import QueueClient
-    AZURE_QUEUE_AVAILABLE = True
-except Exception:
-    QueueClient = None
-    AZURE_QUEUE_AVAILABLE = False
 import uuid
 from assessment.services.queue_service import QueueService
 

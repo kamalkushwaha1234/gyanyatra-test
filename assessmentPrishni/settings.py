@@ -166,5 +166,4 @@ USE_X_FORWARDED_HOST = True
 
 REPORT_EMAIL_CC = ["anima@prishni.in"]
 REPORT_EMAIL_BCC = ["kamal@prishni.in"]
-AZURE_QUEUE_CONNECTION = os.environ.get("AZURE_QUEUE_CONNECTION", "")
-QUEUE_NAME = os.environ.get("QUEUE_NAME", "testqueue")
+SQS_QUEUE_URL = os.environ.get("SQS_QUEUE_URL", "")
