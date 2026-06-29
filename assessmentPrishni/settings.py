@@ -1,5 +1,4 @@
 import os
-from logging.handlers import RotatingFileHandler
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -7,7 +6,7 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "n4&=_re9tg9h+r)^*ct(q@scv_&sn5fe&3!y&mo!_a!iltc4%f"
-DEBUG = bool(int(os.environ.get("DEBUG", 1)))
+DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 print("DEBUG",DEBUG)
 DOMAIN = os.environ.get("DOMAIN", "http://localhost:8000")
 
@@ -70,7 +69,6 @@ WSGI_APPLICATION = "assessmentPrishni.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 if DEBUG:
-    LOG_FILE = "logFile.log"
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -85,13 +83,10 @@ if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
     MEDIA_URL = "/media/"
 else:
-    LOG_FILE = "/var/log/app-logs/logfile.log" # Default to '/home/LogFiles' if AZURE_LOG_PATH is not set
-    STATIC_URL = os.environ.get("AZURESTATICURL", "") + "/"
-    MEDIA_URL = os.environ.get("AZUREMEDIAURL", "") + "/"
+    STATIC_URL = "/static/"
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-    DEFAULT_FILE_STORAGE = "assessmentPrishni.custom_azure.AzureMediaStorage"
-    STATICFILES_STORAGE = "assessmentPrishni.custom_azure.AzureStaticStorage"
+    MEDIA_URL = "/media/"
     CSRF_TRUSTED_ORIGINS = os.environ.get("DOMAIN", "http://localhost:8000").split(",")
     CSRF_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS
     CORS_ORIGINS_WHITELIST = CSRF_TRUSTED_ORIGINS
@@ -143,24 +138,18 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {
-        "file": {
+        "console": {
             "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler", # Using RotatingFileHandler to manage log file size
-            "filename": LOG_FILE,
-            "maxBytes": 1024 * 1024 * 15,
-            "backupCount": 5,
+            "class": "logging.StreamHandler",
             "formatter": "app",
         },
     },
     "loggers": {
-        "django": {"handlers": ["file"], "level": "INFO", "propagate": True},
+        "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
     },
     "formatters": {
         "app": {
-            "format": (
-                u"%(asctime)s [%(levelname)-8s] "
-                "(%(module)s.%(funcName)s) %(message)s"
-            ),
+            "format": u"%(asctime)s [%(levelname)-8s] (%(module)s.%(funcName)s) %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
