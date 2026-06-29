@@ -8,6 +8,7 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "n4&=_re9tg9h+r)^*ct(q@scv_&sn5fe&3!y&mo!_a!iltc4%f"
 DEBUG = bool(int(os.environ.get("DEBUG", 1)))
+print("DEBUG",DEBUG)
 DOMAIN = os.environ.get("DOMAIN", "http://localhost:8000")
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
