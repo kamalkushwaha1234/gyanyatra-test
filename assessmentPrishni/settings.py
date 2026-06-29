@@ -84,7 +84,7 @@ if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
     MEDIA_URL = "/media/"
 else:
-    LOG_FILE = os.path.join(os.environ.get("AZURE_LOG_PATH", "/home/LogFiles"), "logfile.log")   # Default to '/home/LogFiles' if AZURE_LOG_PATH is not set
+    LOG_FILE = os.path.join(os.environ.get("AZURE_LOG_PATH", "/var/log/app-logs/logfile.log"), "logfile.log")   # Default to '/home/LogFiles' if AZURE_LOG_PATH is not set
     STATIC_URL = os.environ.get("AZURESTATICURL", "") + "/"
     MEDIA_URL = os.environ.get("AZUREMEDIAURL", "") + "/"
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
