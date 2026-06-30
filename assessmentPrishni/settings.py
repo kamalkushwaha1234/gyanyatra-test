@@ -10,7 +10,7 @@ DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 print("DEBUG",DEBUG)
 DOMAIN = os.environ.get("DOMAIN", "http://localhost:8000")
 
-ALLOWED_HOSTS = "*"
+ALLOWED_HOSTS = ["*"]
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
